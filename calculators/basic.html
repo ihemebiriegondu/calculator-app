@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/basic.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/2.5.1/uicons-thin-straight/css/uicons-thin-straight.css"
+    />
+    <title>Basic calculator</title>
+  </head>
+  <body>
+    <header>
+      <div id="recall-div">
+        <p id="recall-key"><i class="fi fi-ts-pending"></i></p>
+      </div>
+      <div class="display-divs">
+        <input
+          type="tel"
+          name="display1"
+          id="display1-input"
+          class="display-inputs"
+          value="2+2+2"
+          readonly
+        />
+      </div>
+      <div class="display-divs">
+        <input
+          type="tel"
+          name=""
+          id="display2-input"
+          class="display-inputs"
+          value="6"
+          readonly
+        />
+      </div>
+    </header>
+
+    <main>
+      <div class="keyColumns">
+        <div class="keyRows">
+          <p class="keys acKey dkeys">C</p>
+          <p class="keys perKey dkeys">%</p>
+          <p class="keys delKey dkeys"><i class="fi fi-ts-delete"></i></p>
+          <p class="keys opkeys divKey ykeys">/</p>
+        </div>
+
+        <div class="keyRows">
+          <p class="keys noKeys wkeys">7</p>
+          <p class="keys noKeys wkeys">8</p>
+          <p class="keys noKeys wkeys">9</p>
+          <p class="keys opkeys mulKey ykeys">*</p>
+        </div>
+
+        <div class="keyRows">
+          <p class="keys noKeys wkeys">4</p>
+          <p class="keys noKeys wkeys">5</p>
+          <p class="keys noKeys wkeys">6</p>
+          <p class="keys opkeys minusKey ykeys">-</p>
+        </div>
+
+        <div class="keyRows">
+          <p class="keys noKeys wkeys">1</p>
+          <p class="keys noKeys wkeys">2</p>
+          <p class="keys noKeys wkeys">3</p>
+          <p class="keys opkeys plusKey ykeys">+</p>
+        </div>
+
+        <div class="keyRows">
+          <p class="keys changeKey wkeys"><i class="fi fi-ts-replace"></i></p>
+          <p class="keys noKeys wkeys">0</p>
+          <p class="keys noKeys wkeys">.</p>
+          <p class="keys equalsKey ykeys">=</p>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+.keyColumns{
+    display: grid;
+    row-gap: 10px;
+}
+
+.keyRows {
+  display: grid;
+  grid-template-columns:  repeat(4, 1fr);
+  column-gap: 10px;
+}
+
+.keys {
+  text-align: center;
+  padding: 19px 0;
+  margin: 0;
+  border-radius: 20px;
+}
+
+.dkeys {
+  color: #fefefe;
+  background-color: #595959;
+  box-shadow: -4px -4px 4px rgba(255, 255, 255, 0.25) inset;
+}
+
+.ykeys{
+    color: #2C2C2C;
+    background-color: #FF9A03;
+    box-shadow: -5px -7px 4px rgba(255, 255, 255, 0.25) inset;
+}
+
+.wkeys{
+    color: #2C2C2C;
+    background-color: #D9D9D9;
+    box-shadow: -14px -12px 4px rgba(255, 255, 255, 0.25) inset;
+}

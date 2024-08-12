@@ -1,3 +1,38 @@
+const displayResultsOnChangeFunction = () => {
+  let disp1Value = document.querySelector("#display1-input");
+  let disp2Value = document.querySelector("#display2-input");
+  
+  //get all the basic operators
+  const regex = /[+*\/-]/g;
+
+  const operators = {
+    "+": (a, b) => parseFloat(a) + parseFloat(b),
+    "-": (a, b) => parseFloat(a) - parseFloat(b),
+    "*": (a, b) => parseFloat(a) * parseFloat(b),
+    "/": (a, b) => parseFloat(a) / parseFloat(b),
+  };
+  const operator = regex.exec(disp1Value.value);
+
+  if (operator) {
+    //console.log(operator)
+    const inputValue = operator.input;
+    const operatorSign = operator[0];
+
+    //get the math operator used, the number before and after the operator was/is used
+    let noBeforeSign = inputValue.lastIndexOf(operatorSign);
+    let prev = inputValue.substring(0, noBeforeSign);
+    let curr = inputValue.substring(noBeforeSign + 1);
+
+    //if there is a number after the operator, update the result else the currValue will be empty
+    if (curr.length > 0) {
+      let calcValue = operators[operatorSign](prev, curr);
+      document.querySelector("#display2-input").value = calcValue.toString();
+    } else {
+      document.querySelector("#display2-input").value = "";
+    }
+  }
+};
+
 //number display and append
 const showNumbersFunction = (buttonNo) => {
   let disp1Value = document.querySelector("#display1-input");
@@ -26,6 +61,7 @@ const showNumbersFunction = (buttonNo) => {
 
   //update the values
   document.querySelector("#display1-input").value = displays[0].prevDisplay;
+  displayResultsOnChangeFunction();
 };
 
 //show zero only once(if its the first value) and many times after other value(s)
@@ -41,12 +77,15 @@ const showZeroFunction = (buttonNo) => {
         //console.log("there are other numbers");
         document.querySelector("#display1-input").value = disp1Value.value +=
           buttonNo.textContent;
+
+        displayResultsOnChangeFunction();
         return;
       }
     }
   }
 };
 
+//show decimal point only once, either with zero as a start or only once later
 const showDecimalPointFunction = (decPoint) => {
   let disp1Value = document.querySelector("#display1-input");
 
@@ -62,12 +101,25 @@ const showDecimalPointFunction = (decPoint) => {
   }
 };
 
-const showOperatorFunction = () => {
-  console.log("operator");
+//function to show the clicked operators
+const showOperatorFunction = (operatorType) => {
+  const regex = /[+*\/-]/g;
+
+  let disp1Value = document.querySelector("#display1-input");
+  console.log(operatorType);
+
+  //check if the input is not empty and if the last value is not a decimal point, then add the operator to the inputfield
+  if (
+    disp1Value.value.length > 0 &&
+    disp1Value.value[disp1Value.value.length - 1] !== "." &&
+    !regex.test(disp1Value.value)
+  ) {
+    document.querySelector("#display1-input").value =
+      disp1Value.value + operatorType.textContent;
+  }
 };
 
 const delFunction = () => {
-  console.log("delete");
   let disp1Value = document.querySelector("#display1-input");
 
   let displays = [
@@ -78,11 +130,13 @@ const delFunction = () => {
   ];
 
   document.querySelector("#display1-input").value = displays[0].prevDisplay;
+  displayResultsOnChangeFunction();
 };
 
 //function to clear all inputs
 const clearAll = () => {
   document.querySelector("#display1-input").value = "";
+  document.querySelector("#display2-input").value = "0";
 };
 
 const buttonsClickFunction = (event) => {
@@ -96,7 +150,7 @@ const buttonsClickFunction = (event) => {
   } else if (buttonType.classList.contains("pointKey")) {
     showDecimalPointFunction(buttonType);
   } else if (buttonType.classList.contains("opkeys")) {
-    showOperatorFunction();
+    showOperatorFunction(buttonType);
   } else if (buttonType.classList.contains("delKey")) {
     delFunction();
   } else if (buttonType.classList.contains("acKey")) {

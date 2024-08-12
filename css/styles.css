@@ -7,6 +7,11 @@ body {
   height: 100vh;
   background-color: black;
   display: flex;
+  justify-content: center;
+}
+
+#container {
+  display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
@@ -21,8 +26,12 @@ header {
 
 #recall-div {
   text-align: end;
-  font-size: 25px;
+  font-size: 20px;
   font-weight: 500;
+}
+
+#recall-key {
+  margin: 10px 0;
 }
 
 .display-divs {
@@ -52,4 +61,61 @@ header {
 main {
   padding: 40px 17px 25px 17px;
   font-size: 32px;
+}
+
+
+@media (max-height: 680px) {
+    main {
+        padding: 20px 17px;
+        font-size: 25px;
+      }
+}
+
+
+@media (max-height: 380px) {
+    main {
+        padding: 20px 17px;
+        font-size: 20px;
+      }
+}
+
+
+@media only screen and (min-width: 600px) {
+  #container {
+    width: 80%;
+  }
+
+  header {
+    margin-top: 40px;
+    padding: 14px 24px;
+    border-radius: 18px;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  #container {
+    width: 60%;
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  #container {
+    width: 50%;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  #container {
+    width: 40%;
+  }
+  main {
+    padding: 40px 10px 25px 10px;
+    font-size: 32px;
+  }
+}
+
+@media only screen and (min-width: 1400px) {
+  #container {
+    width: 30%;
+  }
 }

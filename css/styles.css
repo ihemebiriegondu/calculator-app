@@ -11,6 +11,7 @@ body {
 }
 
 #container {
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -22,6 +23,8 @@ header {
   background-color: #4b4b4b;
   color: white;
   border-radius: 0 0 18px 18px;
+  display: flex;
+  flex-direction: column;
 }
 
 #recall-div {
@@ -39,6 +42,10 @@ header {
   overflow: hidden;
 }
 
+.firstDisDiv{
+  flex-grow: 1;
+}
+
 .display-inputs {
   outline: none;
   border: none;
@@ -47,10 +54,13 @@ header {
   background: transparent;
   color: inherit;
   padding-right: 2px;
+  word-break: break-all;
+  resize: none;
 }
 
 #display1-input {
   font-size: 60px;
+  height: 100%;
 }
 
 #display2-input {
@@ -63,22 +73,19 @@ main {
   font-size: 32px;
 }
 
-
 @media (max-height: 680px) {
-    main {
-        padding: 20px 17px;
-        font-size: 25px;
-      }
+  main {
+    padding: 20px 17px;
+    font-size: 25px;
+  }
 }
-
 
 @media (max-height: 380px) {
-    main {
-        padding: 20px 17px;
-        font-size: 20px;
-      }
+  main {
+    padding: 20px 17px;
+    font-size: 20px;
+  }
 }
-
 
 @media only screen and (min-width: 600px) {
   #container {

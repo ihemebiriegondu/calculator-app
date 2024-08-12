@@ -18,25 +18,26 @@
         <div id="recall-div">
           <p id="recall-key"><i class="fi fi-ts-pending"></i></p>
         </div>
-        <div class="display-divs">
-          <input
+        <div class="display-divs firstDisDiv">
+          <textarea
             type="tel"
             name="display1"
             id="display1-input"
             class="display-inputs"
-            value="2+2+2"
+            value=""
             readonly
-          />
+            cols="6"
+          ></textarea>
         </div>
         <div class="display-divs">
-          <input
+          <textarea
             type="tel"
             name=""
             id="display2-input"
             class="display-inputs"
-            value="6"
+            value="0"
             readonly
-          />
+          ></textarea>
         </div>
       </header>
 
@@ -45,7 +46,7 @@
           <div class="keyRows">
             <p class="keys acKey dkeys">C</p>
             <p class="keys perKey dkeys">%</p>
-            <p class="keys delKey dkeys"><i class="fi fi-ts-delete"></i></p>
+            <p class="keys delKey dkeys"><i class="fi fi-ts-delete delKey"></i></p>
             <p class="keys opkeys divKey ykeys">/</p>
           </div>
 
@@ -72,12 +73,14 @@
 
           <div class="keyRows">
             <p class="keys changeKey wkeys"><i class="fi fi-ts-replace"></i></p>
-            <p class="keys noKeys wkeys">0</p>
-            <p class="keys noKeys wkeys">.</p>
+            <p class="keys zeroKey wkeys">0</p>
+            <p class="keys pointKey wkeys">.</p>
             <p class="keys equalsKey ykeys">=</p>
           </div>
         </div>
       </main>
     </div>
   </body>
+
+  <script src="/js/basicOperations.js"></script>
 </html>

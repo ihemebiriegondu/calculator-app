@@ -33,7 +33,10 @@ const displayResultsOnChangeFunction = () => {
     //if there is a number after the operator, update the result else the currValue will be empty
     if (curr.length > 0) {
       let calcValue = operators[operatorSign](prev, curr);
-      if (calcValue.toString() === "Infinity") {
+      if (
+        calcValue.toString() === "Infinity" ||
+        calcValue.toString() === "-Infinity"
+      ) {
         document.querySelector("#display2-input").value = "Error";
         document.querySelector("#display2-input").style.visibility = "hidden";
       } else {
@@ -52,8 +55,9 @@ const showNumbersFunction = (buttonNo) => {
   let disp2Value = document.querySelector("#display2-input");
 
   //check if the first value is 0 and remove it
-  if (disp1Value.value === "0" || disp2Value.value === "Error") {
+  if (disp1Value.value === "0" || disp1Value.value === "Error") {
     document.querySelector("#display1-input").value = "";
+    document.querySelector("#display2-input").value = "";
   }
 
   let displays = [
@@ -95,7 +99,7 @@ const showZeroFunction = (buttonNo) => {
   const regex = /[+*\/-]/g;
   const operator = regex.exec(disp1Value.value);
 
-  if (disp1Value.value.length <= 0 || disp2Value.value === "Error") {
+  if (disp1Value.value.length <= 0 || disp1Value.value === "Error") {
     document.querySelector("#display1-input").value = buttonNo.textContent;
   } else if (
     disp1Value.value.length > 0 &&
@@ -152,7 +156,7 @@ const showDecimalPointFunction = (decPoint) => {
   if (
     disp1Value.value.length <= 0 ||
     disp2Value.value === "=" ||
-    disp2Value.value === "Error"
+    disp1Value.value === "Error"
   ) {
     document.querySelector("#display1-input").value = "0.";
     document.querySelector("#display2-input").value = "";
@@ -191,12 +195,11 @@ const showDecimalPointFunction = (decPoint) => {
     disp1Value.value.length < 30 &&
     !disp1Value.value.includes(decPoint.textContent)
   ) {
-    if (operator && operator.input[-1] === operator[0]) {
+    if (regex.test(disp1Value.value.slice(-1))) {
       //console.log("last value is an operator");
       document.querySelector("#display1-input").value = disp1Value.value +=
         "0.";
     } else {
-      console.log("hjj");
       document.querySelector("#display1-input").value = disp1Value.value +=
         decPoint.textContent;
     }

@@ -1,7 +1,7 @@
 const displayResultsOnChangeFunction = () => {
   let disp1Value = document.querySelector("#display1-input");
   let disp2Value = document.querySelector("#display2-input");
-  
+
   //get all the basic operators
   const regex = /[+*\/-]/g;
 
@@ -26,7 +26,11 @@ const displayResultsOnChangeFunction = () => {
     //if there is a number after the operator, update the result else the currValue will be empty
     if (curr.length > 0) {
       let calcValue = operators[operatorSign](prev, curr);
-      document.querySelector("#display2-input").value = calcValue.toString();
+      if (calcValue.toString() === "Infinity") {
+        console.log("in");
+      } else {
+        document.querySelector("#display2-input").value = calcValue.toString();
+      }
     } else {
       document.querySelector("#display2-input").value = "";
     }
@@ -68,10 +72,17 @@ const showNumbersFunction = (buttonNo) => {
 const showZeroFunction = (buttonNo) => {
   let disp1Value = document.querySelector("#display1-input");
 
+  const regex = /[+*\/-]/g;
+  const operator = regex.exec(disp1Value.value);
+
   if (disp1Value.value.length <= 0) {
     document.querySelector("#display1-input").value = buttonNo.textContent;
-  } else if (disp1Value.value.length > 0 && disp1Value.value.length < 30) {
-    //if zero is the first and only value, more zeros won't be added else, more will be added
+  } else if (
+    disp1Value.value.length > 0 &&
+    disp1Value.value.length < 30 &&
+    !operator
+  ) {
+    //if zero is the first and only value, more zeros won't be added, else more will be added
     for (let i = 0; i < disp1Value.value.length; i++) {
       if (disp1Value.value[i] !== "0") {
         //console.log("there are other numbers");
@@ -82,22 +93,65 @@ const showZeroFunction = (buttonNo) => {
         return;
       }
     }
+  } else if (
+    disp1Value.value.length > 0 &&
+    disp1Value.value.length < 30 &&
+    operator
+  ) {
+    const inputValue = operator.input;
+    const operatorSign = operator[0];
+
+    //get the math operator used, and the number after the operator was used
+    let noBeforeSign = inputValue.lastIndexOf(operatorSign);
+    let curr = inputValue.substring(noBeforeSign + 1);
+
+    //if the only value after the operator is zero, no other zero will be added. else only one zero is added
+    if (disp1Value.value.endsWith(operator[0])) {
+      document.querySelector("#display1-input").value = disp1Value.value +=
+        buttonNo.textContent;
+    } else if (curr !== "0") {
+      document.querySelector("#display1-input").value = disp1Value.value +=
+        buttonNo.textContent;
+    }
   }
 };
 
-//show decimal point only once, either with zero as a start or only once later
+//show decimal point only once, either with zero as a start or only twice (before and after the operator) later
 const showDecimalPointFunction = (decPoint) => {
   let disp1Value = document.querySelector("#display1-input");
 
+  const regex = /[+*\/-]/g;
+  const operator = regex.exec(disp1Value.value);
+
   if (disp1Value.value.length <= 0) {
     document.querySelector("#display1-input").value = "0.";
-  } else {
-    if (disp1Value.value.includes(decPoint.textContent)) {
-      //console.log("there's already point");
-    } else if (disp1Value.value.length > 0 && disp1Value.value.length < 30) {
-      document.querySelector("#display1-input").value = disp1Value.value +=
-        decPoint.textContent;
+  } else if (
+    //if there is already a decimal point
+    disp1Value.value.length > 0 &&
+    disp1Value.value.length < 30 &&
+    disp1Value.value.includes(decPoint.textContent)
+  ) {
+    if (operator) {
+      const inputValue = operator.input;
+      const operatorSign = operator[0];
+
+      //get the math operator used, and the number after the operator was used
+      let noBeforeSign = inputValue.lastIndexOf(operatorSign);
+      let curr = inputValue.substring(noBeforeSign + 1);
+
+      //if there is a number after the operator and the number does not already have a decimal point
+      if (curr.length > 0 && !curr.includes(decPoint.textContent)) {
+        document.querySelector("#display1-input").value = disp1Value.value +=
+          decPoint.textContent;
+      } else if (curr.length <= 0) {
+        document.querySelector("#display1-input").value = disp1Value.value +=
+          "0.";
+      }
     }
+  } else if (disp1Value.value.length > 0 && disp1Value.value.length < 30) {
+    console.log("point");
+    document.querySelector("#display1-input").value = disp1Value.value +=
+      decPoint.textContent;
   }
 };
 
@@ -106,7 +160,7 @@ const showOperatorFunction = (operatorType) => {
   const regex = /[+*\/-]/g;
 
   let disp1Value = document.querySelector("#display1-input");
-  console.log(operatorType);
+  //console.log(operatorType);
 
   //check if the input is not empty and if the last value is not a decimal point, then add the operator to the inputfield
   if (
@@ -136,7 +190,16 @@ const delFunction = () => {
 //function to clear all inputs
 const clearAll = () => {
   document.querySelector("#display1-input").value = "";
-  document.querySelector("#display2-input").value = "0";
+  document.querySelector("#display2-input").value = "";
+};
+
+const equalsToFunction = () => {
+  let disp2Value = document.querySelector("#display2-input");
+
+  if (disp2Value.value !== "") {
+    document.querySelector("#display1-input").value = disp2Value.value;
+    document.querySelector("#display2-input").value = "";
+  }
 };
 
 const buttonsClickFunction = (event) => {
@@ -155,6 +218,8 @@ const buttonsClickFunction = (event) => {
     delFunction();
   } else if (buttonType.classList.contains("acKey")) {
     clearAll();
+  } else if (buttonType.classList.contains("equalsKey")) {
+    equalsToFunction();
   }
 };
 

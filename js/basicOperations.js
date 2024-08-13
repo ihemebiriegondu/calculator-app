@@ -1,3 +1,15 @@
+//called when the equalto sign is pressed
+const equalsToFunction = () => {
+  let disp2Value = document.querySelector("#display2-input");
+
+  if (disp2Value.value !== "" && disp2Value.value !== "=") {
+    document.querySelector("#display1-input").value = disp2Value.value;
+    document.querySelector("#display2-input").value = "=";
+    document.querySelector("#display2-input").style.visibility = "hidden";
+  }
+};
+
+//changes as the input values changes
 const displayResultsOnChangeFunction = () => {
   let disp1Value = document.querySelector("#display1-input");
   let disp2Value = document.querySelector("#display2-input");
@@ -35,7 +47,8 @@ const displayResultsOnChangeFunction = () => {
       let calcValue = operators[operatorSign](prev, curr);
       if (
         calcValue.toString() === "Infinity" ||
-        calcValue.toString() === "-Infinity"
+        calcValue.toString() === "-Infinity" ||
+        calcValue.toString() === "NaN"
       ) {
         document.querySelector("#display2-input").value = "Error";
         document.querySelector("#display2-input").style.visibility = "hidden";
@@ -213,22 +226,81 @@ const showOperatorFunction = (operatorType) => {
   let disp1Value = document.querySelector("#display1-input");
   //console.log(operatorType);
 
-  //check if the input is not empty and if the last value is not a decimal point, then add the operator to the inputfield
-  if (
-    disp1Value.value.length > 0 &&
-    disp1Value.value[disp1Value.value.length - 1] !== "." &&
-    !regex.test(disp1Value.value) &&
-    disp1Value.value !== "Error"
-  ) {
-    document.querySelector("#display1-input").value =
-      disp1Value.value + operatorType.textContent;
-    document.querySelector("#display2-input").value = "";
+  if (disp1Value.value.length > 0) {
+    if (!regex.test(disp1Value.value.slice(-1))) {
+      //if the input is not empty and if the last value is not a decimal point, then add the operator to the inputfield
+      if (
+        disp1Value.value[disp1Value.value.length - 1] !== "." &&
+        !regex.test(disp1Value.value) &&
+        disp1Value.value !== "Error"
+      ) {
+        document.querySelector("#display1-input").value =
+          disp1Value.value + operatorType.textContent;
+        document.querySelector("#display2-input").value = "";
+      } else if (disp1Value.value[0] === "-" && !regex.test(disp1Value.value)) {
+        console.log("the values is negative (has - in the front)");
+        //if the input field is not just the negative sign then other operators can be added
+        if (disp1Value.value !== "-") {
+          document.querySelector("#display1-input").value =
+            disp1Value.value + operatorType.textContent;
+          document.querySelector("#display2-input").value = "";
+        }
+      }
+    } else {
+      console.log("last char is an operator");
+      if (
+        disp1Value.value.slice(-1) === "/" ||
+        disp1Value.value.slice(-1) === "*"
+      ) {
+        //if the last operator is / or * and the minus button is clicked, it should be added to the input field
+        if (operatorType.textContent === "-") {
+          //console.log("minus after mult or div");
+          document.querySelector("#display1-input").value =
+            disp1Value.value + "-";
+          document.querySelector("#display2-input").value = "";
+
+          //if the last operator is / or * and the +,/,* buttons are clicked, the operator will change
+        } else if (
+          operatorType.textContent === "+" ||
+          operatorType.textContent === "/" ||
+          operatorType.textContent === "*"
+        ) {
+          document.querySelector("#display1-input").value =
+            disp1Value.value.slice(0, -1) + operatorType.textContent;
+        }
+      } else if (disp1Value.value.slice(-1) === "+") {
+        //if the last operator is + and the -,/,* buttons are clicked, the operator will change
+        if (
+          operatorType.textContent === "/" ||
+          operatorType.textContent === "*" ||
+          operatorType.textContent === "-"
+        ) {
+          document.querySelector("#display1-input").value =
+            disp1Value.value.slice(0, -1) + operatorType.textContent;
+        }
+      } else if (disp1Value.value.slice(-1) === "-") {
+        //if the last operator is - and the -,/,* buttons are clicked, the operator will change
+        if (disp1Value.value !== "-") {
+          //console.log(disp1Value.value.slice(-2));
+          if (
+            disp1Value.value.slice(-2) === "/-" ||
+            disp1Value.value.slice(-2) === "*-"
+          ) {
+            if (operatorType.textContent !== "-") {
+              document.querySelector("#display1-input").value =
+                disp1Value.value.slice(0, -2) + operatorType.textContent;
+            }
+          } else {
+            document.querySelector("#display1-input").value =
+              disp1Value.value.slice(0, -1) + operatorType.textContent;
+          }
+        }
+      }
+    }
   } else {
-    //console.log("already operators");
-    if (disp1Value.value[0] === "-" && !regex.test(disp1Value.value)) {
-      //console.log("the values is negative (has - in the front)");
-      document.querySelector("#display1-input").value =
-        disp1Value.value + operatorType.textContent;
+    //if the input field is empty and the minus button is pressed, - is added
+    if (operatorType.textContent === "-") {
+      document.querySelector("#display1-input").value = "-";
       document.querySelector("#display2-input").value = "";
     }
   }
@@ -256,16 +328,6 @@ const delFunction = () => {
 const clearAll = () => {
   document.querySelector("#display1-input").value = "";
   document.querySelector("#display2-input").value = "";
-};
-
-const equalsToFunction = () => {
-  let disp2Value = document.querySelector("#display2-input");
-
-  if (disp2Value.value !== "" && disp2Value.value !== "=") {
-    document.querySelector("#display1-input").value = disp2Value.value;
-    document.querySelector("#display2-input").value = "=";
-    document.querySelector("#display2-input").style.visibility = "hidden";
-  }
 };
 
 const buttonsClickFunction = (event) => {

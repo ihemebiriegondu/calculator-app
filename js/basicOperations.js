@@ -1,11 +1,21 @@
 //called when the equalto sign is pressed
-const equalsToFunction = () => {
+const equalsToFunction = (caller) => {
   let disp2Value = document.querySelector("#display2-input");
 
-  if (disp2Value.value !== "" && disp2Value.value !== "=") {
-    document.querySelector("#display1-input").value = disp2Value.value;
-    document.querySelector("#display2-input").value = "=";
-    document.querySelector("#display2-input").style.visibility = "hidden";
+  //if the function is called by the equakTo button
+  if (caller === "equals") {
+    if (disp2Value.value !== "" && disp2Value.value !== "=") {
+      document.querySelector("#display1-input").value = disp2Value.value;
+      document.querySelector("#display2-input").value = "=";
+      document.querySelector("#display2-input").style.visibility = "hidden";
+    }
+  } else {
+    //if the function is called in the showOperator function
+    if (disp2Value.value !== "" && disp2Value.value !== "=") {
+      //to perform operation when an operator is clicked not just when the equal to button is clicked
+      document.querySelector("#display1-input").value = disp2Value.value;
+      document.querySelector("#display2-input").value = "";
+    }
   }
 };
 
@@ -227,6 +237,8 @@ const showOperatorFunction = (operatorType) => {
   //console.log(operatorType);
 
   if (disp1Value.value.length > 0) {
+    equalsToFunction();
+
     if (!regex.test(disp1Value.value.slice(-1))) {
       //if the input is not empty and if the last value is not a decimal point, then add the operator to the inputfield
       if (
@@ -238,7 +250,7 @@ const showOperatorFunction = (operatorType) => {
           disp1Value.value + operatorType.textContent;
         document.querySelector("#display2-input").value = "";
       } else if (disp1Value.value[0] === "-" && !regex.test(disp1Value.value)) {
-        console.log("the values is negative (has - in the front)");
+        //console.log("the values is negative (has - in the front)");
         //if the input field is not just the negative sign then other operators can be added
         if (disp1Value.value !== "-") {
           document.querySelector("#display1-input").value =
@@ -247,7 +259,7 @@ const showOperatorFunction = (operatorType) => {
         }
       }
     } else {
-      console.log("last char is an operator");
+      //console.log("last char is an operator");
       if (
         disp1Value.value.slice(-1) === "/" ||
         disp1Value.value.slice(-1) === "*"
@@ -306,6 +318,46 @@ const showOperatorFunction = (operatorType) => {
   }
 };
 
+const percentageFunction = (per) => {
+  const regex = /[+*\/-]/g;
+
+  let disp1Value = document.querySelector("#display1-input");
+  let disp2Value = document.querySelector("#display2-input");
+
+  //if the function is called from the delete function, then the opposite of per is done (*100)
+  if (per === "delete") {
+    if (disp1Value.value !== "") {
+      if (disp1Value.value.slice(-1) === "%") {
+        document.querySelector("#display2-input").value = (
+          parseFloat(disp2Value.value) * 100
+        ).toString();
+        document.querySelector("#display2-input").style.visibility = "visible";
+      }
+    }
+  } else {
+    if (disp1Value.value !== "") {
+      if (disp1Value.value.slice(-1) === per.textContent) {
+        //if the last char is the per symbol
+        document.querySelector("#display1-input").value =
+          disp1Value.value + per.textContent;
+        document.querySelector("#display2-input").value = (
+          parseFloat(disp2Value.value) / 100
+        ).toString();
+        document.querySelector("#display2-input").style.visibility = "visible";
+
+        //if the last char is not an operator
+      } else if (!regex.test(disp1Value.value.slice(-1))) {
+        document.querySelector("#display1-input").value =
+          disp1Value.value + per.textContent;
+        document.querySelector("#display2-input").value = (
+          parseFloat(disp1Value.value) / 100
+        ).toString();
+        document.querySelector("#display2-input").style.visibility = "visible";
+      }
+    }
+  }
+};
+
 const delFunction = () => {
   let disp1Value = document.querySelector("#display1-input");
 
@@ -315,11 +367,20 @@ const delFunction = () => {
     { currDisplay: "" },
     { calcValue: "" },
   ];
+  percentageFunction("delete");
 
   if (disp1Value.value === "Error") {
     document.querySelector("#display1-input").value = "";
   } else {
-    document.querySelector("#display1-input").value = displays[0].prevDisplay;
+    if (disp1Value.value.slice(-1) === "%") {
+      document.querySelector("#display1-input").value = displays[0].prevDisplay;
+      if (!disp1Value.value.slice(-2).includes("%")) {
+        //console.log('there is still per in the field')
+        document.querySelector("#display2-input").value = "";
+      }
+    } else {
+      document.querySelector("#display1-input").value = displays[0].prevDisplay;
+    }
   }
   displayResultsOnChangeFunction();
 };
@@ -342,12 +403,14 @@ const buttonsClickFunction = (event) => {
     showDecimalPointFunction(buttonType);
   } else if (buttonType.classList.contains("opkeys")) {
     showOperatorFunction(buttonType);
+  } else if (buttonType.classList.contains("perKey")) {
+    percentageFunction(buttonType);
   } else if (buttonType.classList.contains("delKey")) {
     delFunction();
   } else if (buttonType.classList.contains("acKey")) {
     clearAll();
   } else if (buttonType.classList.contains("equalsKey")) {
-    equalsToFunction();
+    equalsToFunction("equals");
   }
 };
 

@@ -1,6 +1,7 @@
 const displayResultsOnChangeFunction = () => {
   let disp1Value = document.querySelector("#display1-input");
   let disp2Value = document.querySelector("#display2-input");
+  let operator = "";
 
   //get all the basic operators
   const regex = /[+*\/-]/g;
@@ -11,7 +12,13 @@ const displayResultsOnChangeFunction = () => {
     "*": (a, b) => parseFloat(a) * parseFloat(b),
     "/": (a, b) => parseFloat(a) / parseFloat(b),
   };
-  const operator = regex.exec(disp1Value.value);
+
+  if (disp1Value.value[0] === "-") {
+    regex.lastIndex = 1;
+    operator = regex.exec(disp1Value.value);
+  } else {
+    operator = regex.exec(disp1Value.value);
+  }
 
   if (operator) {
     //console.log(operator)
@@ -27,9 +34,11 @@ const displayResultsOnChangeFunction = () => {
     if (curr.length > 0) {
       let calcValue = operators[operatorSign](prev, curr);
       if (calcValue.toString() === "Infinity") {
-        console.log("in");
+        document.querySelector("#display2-input").value = "Error";
+        document.querySelector("#display2-input").style.visibility = "hidden";
       } else {
         document.querySelector("#display2-input").value = calcValue.toString();
+        document.querySelector("#display2-input").style.visibility = "visible";
       }
     } else {
       document.querySelector("#display2-input").value = "";
@@ -43,7 +52,7 @@ const showNumbersFunction = (buttonNo) => {
   let disp2Value = document.querySelector("#display2-input");
 
   //check if the first value is 0 and remove it
-  if (disp1Value.value === "0") {
+  if (disp1Value.value === "0" || disp2Value.value === "Error") {
     document.querySelector("#display1-input").value = "";
   }
 
@@ -64,34 +73,49 @@ const showNumbersFunction = (buttonNo) => {
   }
 
   //update the values
-  document.querySelector("#display1-input").value = displays[0].prevDisplay;
+  const regex = /[+*\/-]/g;
+
+  //if the equal to button has been pressed, the prev input will start afresh from the buttonNo
+  //but if it is presses after a math symbol it will be appended to the prev value
+  if (disp2Value.value === "=" && !regex.test(disp1Value.value)) {
+    document.querySelector("#display1-input").value = buttonNo.textContent;
+    document.querySelector("#display2-input").value = "";
+    document.querySelector("#display2-input").style.visibility = "visible";
+  } else {
+    document.querySelector("#display1-input").value = displays[0].prevDisplay;
+  }
   displayResultsOnChangeFunction();
 };
 
 //show zero only once(if its the first value) and many times after other value(s)
 const showZeroFunction = (buttonNo) => {
   let disp1Value = document.querySelector("#display1-input");
+  let disp2Value = document.querySelector("#display2-input");
 
   const regex = /[+*\/-]/g;
   const operator = regex.exec(disp1Value.value);
 
-  if (disp1Value.value.length <= 0) {
+  if (disp1Value.value.length <= 0 || disp2Value.value === "Error") {
     document.querySelector("#display1-input").value = buttonNo.textContent;
   } else if (
     disp1Value.value.length > 0 &&
     disp1Value.value.length < 30 &&
     !operator
   ) {
-    //if zero is the first and only value, more zeros won't be added, else more will be added
-    for (let i = 0; i < disp1Value.value.length; i++) {
-      if (disp1Value.value[i] !== "0") {
-        //console.log("there are other numbers");
-        document.querySelector("#display1-input").value = disp1Value.value +=
-          buttonNo.textContent;
-
-        displayResultsOnChangeFunction();
-        return;
+    //if zero is the first and only value(before the equal to sign is pressed), more zeros won't be added, else more will be added
+    if (disp2Value.value !== "=") {
+      for (let i = 0; i < disp1Value.value.length; i++) {
+        if (disp1Value.value[i] !== "0") {
+          //console.log("there are other numbers");
+          document.querySelector("#display1-input").value = disp1Value.value +=
+            buttonNo.textContent;
+          return;
+        }
       }
+    } else {
+      //if the equal to button has been pressed, the prev input will start afresh from the 0
+      //but if it is presses after a math symbol it will be appended to the prev value
+      document.querySelector("#display1-input").value = buttonNo.textContent;
     }
   } else if (
     disp1Value.value.length > 0 &&
@@ -114,23 +138,37 @@ const showZeroFunction = (buttonNo) => {
         buttonNo.textContent;
     }
   }
+  displayResultsOnChangeFunction();
 };
 
 //show decimal point only once, either with zero as a start or only twice (before and after the operator) later
 const showDecimalPointFunction = (decPoint) => {
   let disp1Value = document.querySelector("#display1-input");
+  let disp2Value = document.querySelector("#display2-input");
+  let operator = "";
 
   const regex = /[+*\/-]/g;
-  const operator = regex.exec(disp1Value.value);
 
-  if (disp1Value.value.length <= 0) {
+  if (
+    disp1Value.value.length <= 0 ||
+    disp2Value.value === "=" ||
+    disp2Value.value === "Error"
+  ) {
     document.querySelector("#display1-input").value = "0.";
+    document.querySelector("#display2-input").value = "";
   } else if (
     //if there is already a decimal point
     disp1Value.value.length > 0 &&
     disp1Value.value.length < 30 &&
     disp1Value.value.includes(decPoint.textContent)
   ) {
+    if (disp1Value.value[0] === "-") {
+      regex.lastIndex = 1;
+      operator = regex.exec(disp1Value.value);
+    } else {
+      operator = regex.exec(disp1Value.value);
+    }
+
     if (operator) {
       const inputValue = operator.input;
       const operatorSign = operator[0];
@@ -148,10 +186,20 @@ const showDecimalPointFunction = (decPoint) => {
           "0.";
       }
     }
-  } else if (disp1Value.value.length > 0 && disp1Value.value.length < 30) {
-    console.log("point");
-    document.querySelector("#display1-input").value = disp1Value.value +=
-      decPoint.textContent;
+  } else if (
+    disp1Value.value.length > 0 &&
+    disp1Value.value.length < 30 &&
+    !disp1Value.value.includes(decPoint.textContent)
+  ) {
+    if (operator && operator.input[-1] === operator[0]) {
+      //console.log("last value is an operator");
+      document.querySelector("#display1-input").value = disp1Value.value +=
+        "0.";
+    } else {
+      console.log("hjj");
+      document.querySelector("#display1-input").value = disp1Value.value +=
+        decPoint.textContent;
+    }
   }
 };
 
@@ -166,10 +214,20 @@ const showOperatorFunction = (operatorType) => {
   if (
     disp1Value.value.length > 0 &&
     disp1Value.value[disp1Value.value.length - 1] !== "." &&
-    !regex.test(disp1Value.value)
+    !regex.test(disp1Value.value) &&
+    disp1Value.value !== "Error"
   ) {
     document.querySelector("#display1-input").value =
       disp1Value.value + operatorType.textContent;
+    document.querySelector("#display2-input").value = "";
+  } else {
+    //console.log("already operators");
+    if (disp1Value.value[0] === "-" && !regex.test(disp1Value.value)) {
+      //console.log("the values is negative (has - in the front)");
+      document.querySelector("#display1-input").value =
+        disp1Value.value + operatorType.textContent;
+      document.querySelector("#display2-input").value = "";
+    }
   }
 };
 
@@ -183,7 +241,11 @@ const delFunction = () => {
     { calcValue: "" },
   ];
 
-  document.querySelector("#display1-input").value = displays[0].prevDisplay;
+  if (disp1Value.value === "Error") {
+    document.querySelector("#display1-input").value = "";
+  } else {
+    document.querySelector("#display1-input").value = displays[0].prevDisplay;
+  }
   displayResultsOnChangeFunction();
 };
 
@@ -196,9 +258,10 @@ const clearAll = () => {
 const equalsToFunction = () => {
   let disp2Value = document.querySelector("#display2-input");
 
-  if (disp2Value.value !== "") {
+  if (disp2Value.value !== "" && disp2Value.value !== "=") {
     document.querySelector("#display1-input").value = disp2Value.value;
-    document.querySelector("#display2-input").value = "";
+    document.querySelector("#display2-input").value = "=";
+    document.querySelector("#display2-input").style.visibility = "hidden";
   }
 };
 

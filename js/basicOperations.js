@@ -35,6 +35,7 @@ const displayResultsOnChangeFunction = () => {
     "/": (a, b) => parseFloat(a) / parseFloat(b),
   };
 
+  //if the input has a minus in front, the minus wont be counted as an operator
   if (disp1Value.value[0] === "-") {
     regex.lastIndex = 1;
     operator = regex.exec(disp1Value.value);
@@ -76,42 +77,65 @@ const displayResultsOnChangeFunction = () => {
 const showNumbersFunction = (buttonNo) => {
   let disp1Value = document.querySelector("#display1-input");
   let disp2Value = document.querySelector("#display2-input");
+  //console.log(disp1Value.value);
+  if (disp1Value.value.includes("%")) {
+    //console.log(disp1Value.value);
+    document.querySelector("#display1-input").value = disp1Value.value +=
+      buttonNo.textContent;
 
-  //check if the first value is 0 and remove it
-  if (disp1Value.value === "0" || disp1Value.value === "Error") {
-    document.querySelector("#display1-input").value = "";
-    document.querySelector("#display2-input").value = "";
-  }
+    //console.log(disp1Value.value);
 
-  let displays = [
-    //appendNumbers
-    { prevDisplay: (disp1Value.value += buttonNo.textContent) },
-    { currDisplay: "" },
-    { calcValue: "" },
-  ];
+    let indexOfLastPer = disp1Value.value.lastIndexOf("%");
+    let noBeforePer = disp1Value.value.substring(0, indexOfLastPer);
+    let noAfterPer = disp1Value.value.substring(indexOfLastPer + 1);
 
-  //reduce fontsize as input values becomes more and also setting max no of values to 30
-  const input1length = displays[0].prevDisplay.length;
-  if (input1length >= 14 && input1length < 30) {
-    const fontSize = Math.max(60 - input1length * 0.9, 40);
-    disp1Value.style.fontSize = fontSize + "px";
-  } else if (input1length > 30) {
-    displays[0].prevDisplay = displays[0].prevDisplay.slice(0, 30);
-  }
-
-  //update the values
-  const regex = /[+*\/-]/g;
-
-  //if the equal to button has been pressed, the prev input will start afresh from the buttonNo
-  //but if it is presses after a math symbol it will be appended to the prev value
-  if (disp2Value.value === "=" && !regex.test(disp1Value.value)) {
-    document.querySelector("#display1-input").value = buttonNo.textContent;
-    document.querySelector("#display2-input").value = "";
-    document.querySelector("#display2-input").style.visibility = "visible";
+    /*console.log(indexOfLastPer);
+    console.log(noAfterPer);
+    console.log(noBeforePer);
+    console.log((noBeforePer / 100) * noAfterPer);*/
+    if (noBeforePer.includes("%")) {
+      console.log("no before % sign also has %");
+    } else {
+      document.querySelector("#display2-input").value =
+        (noBeforePer / 100) * noAfterPer;
+    }
   } else {
-    document.querySelector("#display1-input").value = displays[0].prevDisplay;
+    //check if the first value is 0 or error and remove it
+    if (disp1Value.value === "0" || disp1Value.value === "Error") {
+      document.querySelector("#display1-input").value = "";
+      document.querySelector("#display2-input").value = "";
+    }
+
+    let displays = [
+      //appendNumbers
+      { prevDisplay: (disp1Value.value += buttonNo.textContent) },
+      { currDisplay: "" },
+      { calcValue: "" },
+    ];
+
+    //reduce fontsize as input values becomes more and also setting max no of values to 30
+    const input1length = displays[0].prevDisplay.length;
+    if (input1length >= 14 && input1length < 30) {
+      const fontSize = Math.max(60 - input1length * 0.9, 40);
+      disp1Value.style.fontSize = fontSize + "px";
+    } else if (input1length > 30) {
+      displays[0].prevDisplay = displays[0].prevDisplay.slice(0, 30);
+    }
+
+    //update the values
+    const regex = /[+*\/-]/g;
+
+    //if the equal to button has been pressed and the last char is not a math symbol, the prev input will start afresh from the buttonNo
+    if (disp2Value.value === "=" && !regex.test(disp1Value.value)) {
+      document.querySelector("#display1-input").value = buttonNo.textContent;
+      document.querySelector("#display2-input").value = "";
+      document.querySelector("#display2-input").style.visibility = "visible";
+    } else {
+      //but if it is presses after a math symbol it will be appended to the prev value
+      document.querySelector("#display1-input").value = displays[0].prevDisplay;
+    }
+    displayResultsOnChangeFunction();
   }
-  displayResultsOnChangeFunction();
 };
 
 //show zero only once(if its the first value) and many times after other value(s)
@@ -129,14 +153,21 @@ const showZeroFunction = (buttonNo) => {
     disp1Value.value.length < 30 &&
     !operator
   ) {
-    //if zero is the first and only value(before the equal to sign is pressed), more zeros won't be added, else more will be added
     if (disp2Value.value !== "=") {
-      for (let i = 0; i < disp1Value.value.length; i++) {
-        if (disp1Value.value[i] !== "0") {
-          //console.log("there are other numbers");
-          document.querySelector("#display1-input").value = disp1Value.value +=
-            buttonNo.textContent;
-          return;
+      if (disp1Value.value.slice(-1) === "%") {
+        //if zero pressed after the % sign, the final output will be 0
+        document.querySelector("#display1-input").value = disp1Value.value +=
+          buttonNo.textContent;
+        document.querySelector("#display2-input").value = 0;
+      } else {
+        //if zero is the first and only value(before the equal to sign is pressed), more zeros won't be added, else more will be added
+        for (let i = 0; i < disp1Value.value.length; i++) {
+          if (disp1Value.value[i] !== "0") {
+            //console.log("there are other numbers");
+            document.querySelector("#display1-input").value =
+              disp1Value.value += buttonNo.textContent;
+            return;
+          }
         }
       }
     } else {
@@ -338,17 +369,18 @@ const percentageFunction = (per) => {
     if (disp1Value.value !== "") {
       if (disp1Value.value.slice(-1) === per.textContent) {
         //if the last char is the per symbol
-        document.querySelector("#display1-input").value =
-          disp1Value.value + per.textContent;
+        document.querySelector("#display1-input").value += per.textContent;
+
         document.querySelector("#display2-input").value = (
           parseFloat(disp2Value.value) / 100
         ).toString();
         document.querySelector("#display2-input").style.visibility = "visible";
 
-        //if the last char is not an operator
+        //if the last char is not an operator and not the per sign
       } else if (!regex.test(disp1Value.value.slice(-1))) {
-        document.querySelector("#display1-input").value =
-          disp1Value.value + per.textContent;
+        document.querySelector("#display1-input").value = disp1Value.value +=
+          per.textContent;
+
         document.querySelector("#display2-input").value = (
           parseFloat(disp1Value.value) / 100
         ).toString();

@@ -77,27 +77,30 @@ const displayResultsOnChangeFunction = () => {
 const showNumbersFunction = (buttonNo) => {
   let disp1Value = document.querySelector("#display1-input");
   let disp2Value = document.querySelector("#display2-input");
-  //console.log(disp1Value.value);
+
   if (disp1Value.value.includes("%")) {
-    //console.log(disp1Value.value);
     document.querySelector("#display1-input").value = disp1Value.value +=
       buttonNo.textContent;
 
-    //console.log(disp1Value.value);
-
+    let indexOfFirstPer = disp1Value.value.indexOf("%");
     let indexOfLastPer = disp1Value.value.lastIndexOf("%");
-    let noBeforePer = disp1Value.value.substring(0, indexOfLastPer);
+    let noBeforeFirstPer = disp1Value.value.substring(0, indexOfFirstPer);
+    let noBeforeLastPer = disp1Value.value.substring(0, indexOfLastPer);
     let noAfterPer = disp1Value.value.substring(indexOfLastPer + 1);
 
-    /*console.log(indexOfLastPer);
-    console.log(noAfterPer);
-    console.log(noBeforePer);
-    console.log((noBeforePer / 100) * noAfterPer);*/
-    if (noBeforePer.includes("%")) {
-      console.log("no before % sign also has %");
+    //if the percentage sign appears more than once in the input field
+    if (noBeforeLastPer.includes("%")) {
+      //console.log("no before % sign also has %");
+      let noOfPerLeft = noBeforeLastPer.split("%").length;
+
+      //the new output would be the product of the numbers before any % symbol and the numbers after all % symbols raise to power the number of times the symbol appears
+      document.querySelector("#display2-input").value =
+        (noBeforeFirstPer * noAfterPer) / 100 ** noOfPerLeft;
+
+      //if the percentage sign appears just once in the input field
     } else {
       document.querySelector("#display2-input").value =
-        (noBeforePer / 100) * noAfterPer;
+        (noBeforeLastPer / 100) * noAfterPer;
     }
   } else {
     //check if the first value is 0 or error and remove it

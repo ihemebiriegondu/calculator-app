@@ -157,11 +157,26 @@ const showZeroFunction = (buttonNo) => {
     !operator
   ) {
     if (disp2Value.value !== "=") {
-      if (disp1Value.value.slice(-1) === "%") {
-        //if zero pressed after the % sign, the final output will be 0
-        document.querySelector("#display1-input").value = disp1Value.value +=
-          buttonNo.textContent;
-        document.querySelector("#display2-input").value = 0;
+      if (disp1Value.value.includes("%")) {
+        if (disp1Value.value.endsWith("%")) {
+          //if zero pressed after the % sign, the final output will be 0
+          document.querySelector("#display1-input").value = disp1Value.value +=
+            buttonNo.textContent;
+          document.querySelector("#display2-input").value = 0;
+        } else {
+          //console.log("zero not after %");
+          const inputValue = disp1Value.value;
+          let noBeforeSign = inputValue.lastIndexOf("%");
+
+          //if zero is pressed and the number after the % is not all zero, then zero is appended to the disp1Value
+          //and the disp2Value is multiplied by 10 (for each 0 added)
+          if (inputValue.substring(noBeforeSign + 1) !== "0") {
+            document.querySelector("#display1-input").value =
+              disp1Value.value += buttonNo.textContent;
+            document.querySelector("#display2-input").value =
+              disp2Value.value * 10;
+          }
+        }
       } else {
         //if zero is the first and only value(before the equal to sign is pressed), more zeros won't be added, else more will be added
         for (let i = 0; i < disp1Value.value.length; i++) {

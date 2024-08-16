@@ -78,30 +78,39 @@ const showNumbersFunction = (buttonNo) => {
   let disp1Value = document.querySelector("#display1-input");
   let disp2Value = document.querySelector("#display2-input");
 
+  //if the input value has % sign
   if (disp1Value.value.includes("%")) {
-    document.querySelector("#display1-input").value = disp1Value.value +=
-      buttonNo.textContent;
+    //if the last value is %, multiply the input by the buttonNo
+    if (disp1Value.value.endsWith("%")) {
+      document.querySelector("#display1-input").value = disp1Value.value +=
+        buttonNo.textContent;
 
-    let indexOfFirstPer = disp1Value.value.indexOf("%");
-    let indexOfLastPer = disp1Value.value.lastIndexOf("%");
-    let noBeforeFirstPer = disp1Value.value.substring(0, indexOfFirstPer);
-    let noBeforeLastPer = disp1Value.value.substring(0, indexOfLastPer);
-    let noAfterPer = disp1Value.value.substring(indexOfLastPer + 1);
-
-    //if the percentage sign appears more than once in the input field
-    if (noBeforeLastPer.includes("%")) {
-      //console.log("no before % sign also has %");
-      let noOfPerLeft = noBeforeLastPer.split("%").length;
-
-      //the new output would be the product of the numbers before any % symbol and the numbers after all % symbols raise to power the number of times the symbol appears
       document.querySelector("#display2-input").value =
-        (noBeforeFirstPer * noAfterPer) / 100 ** noOfPerLeft;
-
-      //if the percentage sign appears just once in the input field
+        disp2Value.value * buttonNo.textContent;
     } else {
-      document.querySelector("#display2-input").value =
-        (noBeforeLastPer / 100) * noAfterPer;
+      //if the last no is not % (i.e if its a number after another)
+      let indexOfLastPer = disp1Value.value.lastIndexOf("%");
+      let noAfterThePerBeforeAddingButtonNo = disp1Value.value.substring(
+        indexOfLastPer + 1
+      );
+
+      document.querySelector("#display1-input").value = disp1Value.value +=
+        buttonNo.textContent;
+
+      let allNosAfterThePer = disp1Value.value.substring(indexOfLastPer + 1);
+
+      if (noAfterThePerBeforeAddingButtonNo === "0.") {
+        console.log("is 0.");
+        document.querySelector("#display2-input").value =
+          (disp2Value.value / 10) * buttonNo.textContent;
+      } else {
+        document.querySelector("#display2-input").value =
+          (disp2Value.value / noAfterThePerBeforeAddingButtonNo) *
+          allNosAfterThePer;
+      }
     }
+
+    //if the input value does not have any % sign
   } else {
     //check if the first value is 0 or error and remove it
     if (disp1Value.value === "0" || disp1Value.value === "Error") {
@@ -173,8 +182,10 @@ const showZeroFunction = (buttonNo) => {
           if (inputValue.substring(noBeforeSign + 1) !== "0") {
             document.querySelector("#display1-input").value =
               disp1Value.value += buttonNo.textContent;
-            document.querySelector("#display2-input").value =
-              disp2Value.value * 10;
+            if (!inputValue.substring(noBeforeSign + 1).includes(".")) {
+              document.querySelector("#display2-input").value =
+                disp2Value.value * 10;
+            }
           }
         }
       } else {
@@ -267,7 +278,10 @@ const showDecimalPointFunction = (decPoint) => {
     disp1Value.value.length < 30 &&
     !disp1Value.value.includes(decPoint.textContent)
   ) {
-    if (regex.test(disp1Value.value.slice(-1))) {
+    if (
+      regex.test(disp1Value.value.slice(-1)) ||
+      disp1Value.value.endsWith("%")
+    ) {
       //console.log("last value is an operator");
       document.querySelector("#display1-input").value = disp1Value.value +=
         "0.";

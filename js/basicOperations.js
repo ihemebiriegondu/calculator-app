@@ -385,8 +385,9 @@ const percentageFunction = (per) => {
     }
   } else {
     if (disp1Value.value !== "") {
+      //if the last char is the per symbol
       if (disp1Value.value.slice(-1) === per.textContent) {
-        //if the last char is the per symbol
+        //this is for if a per symbol is placed after another
         document.querySelector("#display1-input").value += per.textContent;
 
         document.querySelector("#display2-input").value = (
@@ -394,15 +395,30 @@ const percentageFunction = (per) => {
         ).toString();
         document.querySelector("#display2-input").style.visibility = "visible";
 
-        //if the last char is not an operator and not the per sign
+        //if the last char is not an operator and not the per sign(i.e the % is placed behind a no)
       } else if (!regex.test(disp1Value.value.slice(-1))) {
-        document.querySelector("#display1-input").value = disp1Value.value +=
-          per.textContent;
+        if (disp1Value.value.includes("%")) {
+          //of there is already % in the input field, just divide the output by 100
+          document.querySelector("#display1-input").value = disp1Value.value +=
+            per.textContent;
 
-        document.querySelector("#display2-input").value = (
-          parseFloat(disp1Value.value) / 100
-        ).toString();
-        document.querySelector("#display2-input").style.visibility = "visible";
+          document.querySelector("#display2-input").value = (
+            parseFloat(disp2Value.value) / 100
+          ).toString();
+          document.querySelector("#display2-input").style.visibility =
+            "visible";
+
+          //else if the input does not have % anywhere at all (first percent), divide the original number by 100
+        } else {
+          document.querySelector("#display1-input").value = disp1Value.value +=
+            per.textContent;
+
+          document.querySelector("#display2-input").value = (
+            parseFloat(disp1Value.value) / 100
+          ).toString();
+          document.querySelector("#display2-input").style.visibility =
+            "visible";
+        }
       }
     }
   }

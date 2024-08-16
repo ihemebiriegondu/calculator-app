@@ -100,7 +100,6 @@ const showNumbersFunction = (buttonNo) => {
       let allNosAfterThePer = disp1Value.value.substring(indexOfLastPer + 1);
 
       if (noAfterThePerBeforeAddingButtonNo === "0.") {
-        console.log("is 0.");
         document.querySelector("#display2-input").value =
           (disp2Value.value / 10) * buttonNo.textContent;
       } else {
@@ -169,9 +168,9 @@ const showZeroFunction = (buttonNo) => {
       if (disp1Value.value.includes("%")) {
         if (disp1Value.value.endsWith("%")) {
           //if zero pressed after the % sign, the final output will be 0
-          document.querySelector("#display1-input").value = disp1Value.value +=
+          /*document.querySelector("#display1-input").value = disp1Value.value +=
             buttonNo.textContent;
-          document.querySelector("#display2-input").value = 0;
+          document.querySelector("#display2-input").value = 0;*/
         } else {
           //console.log("zero not after %");
           const inputValue = disp1Value.value;
@@ -440,6 +439,7 @@ const percentageFunction = (per) => {
 
 const delFunction = () => {
   let disp1Value = document.querySelector("#display1-input");
+  let disp2Value = document.querySelector("#display2-input");
 
   let displays = [
     //remove numbers
@@ -452,11 +452,37 @@ const delFunction = () => {
   if (disp1Value.value === "Error") {
     document.querySelector("#display1-input").value = "";
   } else {
-    if (disp1Value.value.slice(-1) === "%") {
-      document.querySelector("#display1-input").value = displays[0].prevDisplay;
-      if (!disp1Value.value.slice(-2).includes("%")) {
-        //console.log('there is still per in the field')
-        document.querySelector("#display2-input").value = "";
+    //if the input field has %
+    if (disp1Value.value.includes("%")) {
+      //if its a % thats been deleted
+      if (disp1Value.value.slice(-1) === "%") {
+        document.querySelector("#display1-input").value =
+          displays[0].prevDisplay;
+        //if after removing the %, there is no % left
+        if (!disp1Value.value.includes("%")) {
+          document.querySelector("#display2-input").value = "";
+        }
+
+        //if it dos not end with %, but has it somewhere in the input field
+      } else if (
+        !disp1Value.value.endsWith("%") &&
+        disp1Value.value.includes("%")
+      ) {
+        let indexOfLastPer = disp1Value.value.lastIndexOf("%");
+        let noAfterPer = disp1Value.value.substring(indexOfLastPer + 1);
+
+        document.querySelector("#display1-input").value =
+          displays[0].prevDisplay;
+
+        let noAfterPerAfterDel = disp1Value.value.substring(indexOfLastPer + 1);
+
+        if (noAfterPerAfterDel !== "") {
+          document.querySelector("#display2-input").value =
+            (disp2Value.value / noAfterPer) * noAfterPerAfterDel;
+        } else {
+          document.querySelector("#display2-input").value =
+            disp2Value.value / noAfterPer;
+        }
       }
     } else {
       document.querySelector("#display1-input").value = displays[0].prevDisplay;

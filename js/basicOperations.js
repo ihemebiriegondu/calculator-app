@@ -249,6 +249,7 @@ const showDecimalPointFunction = (decPoint) => {
     disp1Value.value.includes(decPoint.textContent)
   ) {
     if (disp1Value.value[0] === "-") {
+      //if the number has '-' in the front, start counting the index from 1 instead of 0
       regex.lastIndex = 1;
       operator = regex.exec(disp1Value.value);
     } else {
@@ -270,6 +271,20 @@ const showDecimalPointFunction = (decPoint) => {
       } else if (curr.length <= 0) {
         document.querySelector("#display1-input").value = disp1Value.value +=
           "0.";
+      }
+    } else {
+      if (disp1Value.value.includes("%")) {
+        let noBeforePer = disp1Value.value.lastIndexOf("%");
+        let curr = disp1Value.value.substring(noBeforePer + 1);
+
+        //if there is a number after the percentage and the number does not already have a decimal point
+        if (curr.length > 0 && !curr.includes(decPoint.textContent)) {
+          document.querySelector("#display1-input").value = disp1Value.value +=
+            decPoint.textContent;
+        } else if (curr.length <= 0) {
+          document.querySelector("#display1-input").value = disp1Value.value +=
+            "0.";
+        }
       }
     }
   } else if (

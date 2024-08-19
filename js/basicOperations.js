@@ -24,6 +24,7 @@ const displayResultsOnChangeFunction = () => {
   let disp1Value = document.querySelector("#display1-input");
   let disp2Value = document.querySelector("#display2-input");
   let operator = "";
+  let operatorSign = "";
 
   //get all the basic operators
   const regex = /[+*\/-]/g;
@@ -39,6 +40,15 @@ const displayResultsOnChangeFunction = () => {
   if (disp1Value.value[0] === "-") {
     regex.lastIndex = 1;
     operator = regex.exec(disp1Value.value);
+
+    //if the input has an exponential, then we start counting the operator sign from after the exponential sign
+  } else if (disp1Value.value.includes("e")) {
+    let indexOfe = disp1Value.value.indexOf("e");
+    let newOperator = regex.exec(disp1Value.value.substring(indexOfe + 2));
+    if (newOperator) {
+      operatorSign = newOperator[0];
+    }
+    operator = regex.exec(disp1Value.value);
   } else {
     operator = regex.exec(disp1Value.value);
   }
@@ -46,7 +56,11 @@ const displayResultsOnChangeFunction = () => {
   if (operator) {
     //console.log(operator)
     const inputValue = operator.input;
-    const operatorSign = operator[0];
+
+    //if there is no exponential, the operator sign is the regular sign in the input field
+    if (!inputValue.includes("e")) {
+      operatorSign = operator[0];
+    }
 
     //get the math operator used, the number before and after the operator was/is used
     let noBeforeSign = inputValue.lastIndexOf(operatorSign);
@@ -319,7 +333,7 @@ const showOperatorFunction = (operatorType) => {
   let disp1Value = document.querySelector("#display1-input");
   //console.log(operatorType);
 
-  if (disp1Value.value.length > 0) {
+  if (disp1Value.value.length > 0 && disp1Value.value !== "Error") {
     equalsToFunction();
 
     if (!regex.test(disp1Value.value.slice(-1))) {
@@ -489,7 +503,7 @@ const delFunction = () => {
           document.querySelector("#display2-input").value = "";
         }
 
-        //if it dos not end with %, but has it somewhere in the input field
+        //if it does not end with %, but has it somewhere in the input field
       } else if (
         !disp1Value.value.endsWith("%") &&
         disp1Value.value.includes("%")
@@ -511,7 +525,21 @@ const delFunction = () => {
         }
       }
     } else {
-      document.querySelector("#display1-input").value = displays[0].prevDisplay;
+      if (disp1Value.value.includes("e")) {
+        if (
+          disp1Value.value.slice(-2) === "e-" ||
+          disp1Value.value.slice(-2) === "e+"
+        ) {
+          document.querySelector("#display1-input").value =
+            disp1Value.value.slice(0, -2);
+        } else {
+          document.querySelector("#display1-input").value =
+            displays[0].prevDisplay;
+        }
+      } else {
+        document.querySelector("#display1-input").value =
+          displays[0].prevDisplay;
+      }
     }
   }
   displayResultsOnChangeFunction();

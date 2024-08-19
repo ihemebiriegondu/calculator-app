@@ -531,12 +531,21 @@ const delFunction = () => {
 
         let noAfterPerAfterDel = disp1Value.value.substring(indexOfLastPer + 1);
 
-        if (noAfterPerAfterDel !== "") {
-          document.querySelector("#display2-input").value =
-            (disp2Value.value / noAfterPer) * noAfterPerAfterDel;
-        } else {
-          document.querySelector("#display2-input").value =
-            disp2Value.value / noAfterPer;
+        if (noAfterPer !== "") {
+          if (noAfterPer === "0.") {
+            document.querySelector("#display2-input").value = "0";
+          } else if (noAfterPer === "0") {
+            document.querySelector("#display2-input").value =
+              localStorage.getItem("beforeZero");
+          } else {
+            if (noAfterPerAfterDel !== "") {
+              document.querySelector("#display2-input").value =
+                (disp2Value.value / noAfterPer) * noAfterPerAfterDel;
+            } else {
+              document.querySelector("#display2-input").value =
+                disp2Value.value / noAfterPer;
+            }
+          }
         }
       }
     } else {

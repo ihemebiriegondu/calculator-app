@@ -136,7 +136,7 @@ const showNumbersFunction = (buttonNo) => {
     //update the values
     const regex = /[+*\/-]/g;
 
-    //if the equal to button has been pressed and the last char is not a math symbol, the prev input will start afresh from the buttonNo
+    //if the equal to button has been pressed and there is no math symbol in the output, the prev input will start afresh from the buttonNo
     if (disp2Value.value === "=" && !regex.test(disp1Value.value)) {
       document.querySelector("#display1-input").value = buttonNo.textContent;
       document.querySelector("#display2-input").value = "";
@@ -208,20 +208,26 @@ const showZeroFunction = (buttonNo) => {
     disp1Value.value.length < 30 &&
     operator
   ) {
-    const inputValue = operator.input;
-    const operatorSign = operator[0];
+    if (disp2Value.value === "=") {
+      //if the equal to button has been pressed, the prev input will start afresh from the 0
+      //but if it is presses after a math symbol it will be appended to the prev value
+      document.querySelector("#display1-input").value = buttonNo.textContent;
+    } else {
+      const inputValue = operator.input;
+      const operatorSign = operator[0];
 
-    //get the math operator used, and the number after the operator was used
-    let noBeforeSign = inputValue.lastIndexOf(operatorSign);
-    let curr = inputValue.substring(noBeforeSign + 1);
+      //get the math operator used, and the number after the operator was used
+      let noBeforeSign = inputValue.lastIndexOf(operatorSign);
+      let curr = inputValue.substring(noBeforeSign + 1);
 
-    //if the only value after the operator is zero, no other zero will be added. else only one zero is added
-    if (disp1Value.value.endsWith(operator[0])) {
-      document.querySelector("#display1-input").value = disp1Value.value +=
-        buttonNo.textContent;
-    } else if (curr !== "0") {
-      document.querySelector("#display1-input").value = disp1Value.value +=
-        buttonNo.textContent;
+      //if the only value after the operator is zero, no other zero will be added. else only one zero is added
+      if (disp1Value.value.endsWith(operator[0])) {
+        document.querySelector("#display1-input").value = disp1Value.value +=
+          buttonNo.textContent;
+      } else if (curr !== "0") {
+        document.querySelector("#display1-input").value = disp1Value.value +=
+          buttonNo.textContent;
+      }
     }
   }
   displayResultsOnChangeFunction();
@@ -318,15 +324,20 @@ const showOperatorFunction = (operatorType) => {
 
     if (!regex.test(disp1Value.value.slice(-1))) {
       //if the input is not empty and if the last value is not a decimal point, then add the operator to the inputfield
+      //or if there is an exponential
       if (
-        disp1Value.value[disp1Value.value.length - 1] !== "." &&
-        !regex.test(disp1Value.value) &&
-        disp1Value.value !== "Error"
+        (!disp1Value.value.endsWith(".") &&
+          !regex.test(disp1Value.value) &&
+          disp1Value.value !== "Error") ||
+        disp1Value.value.includes("e")
       ) {
         document.querySelector("#display1-input").value =
           disp1Value.value + operatorType.textContent;
         document.querySelector("#display2-input").value = "";
-      } else if (disp1Value.value[0] === "-" && !regex.test(disp1Value.value)) {
+      } else if (
+        (disp1Value.value[0] === "-" && !regex.test(disp1Value.value)) ||
+        disp1Value.value.includes("e")
+      ) {
         //console.log("the values is negative (has - in the front)");
         //if the input field is not just the negative sign then other operators can be added
         if (disp1Value.value !== "-") {

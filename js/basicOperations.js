@@ -17,6 +17,7 @@ const equalsToFunction = (caller) => {
       document.querySelector("#display2-input").value = "";
     }
   }
+  localStorage.clear();
 };
 
 //changes as the input values changes
@@ -113,9 +114,18 @@ const showNumbersFunction = (buttonNo) => {
 
       let allNosAfterThePer = disp1Value.value.substring(indexOfLastPer + 1);
 
-      if (noAfterThePerBeforeAddingButtonNo === "0.") {
+      //console.log(localStorage.getItem("beforeZero"));
+      if (noAfterThePerBeforeAddingButtonNo === "0") {
         document.querySelector("#display2-input").value =
-          (disp2Value.value / 10) * buttonNo.textContent;
+          localStorage.getItem("beforeZero") * buttonNo.textContent;
+      } else if (noAfterThePerBeforeAddingButtonNo === "0.") {
+        if (localStorage.getItem("beforeZero") === null) {
+          document.querySelector("#display2-input").value =
+            (disp2Value.value / 10) * buttonNo.textContent;
+        } else {
+          document.querySelector("#display2-input").value =
+            (localStorage.getItem("beforeZero") / 10) * buttonNo.textContent;
+        }
       } else {
         document.querySelector("#display2-input").value =
           (disp2Value.value / noAfterThePerBeforeAddingButtonNo) *
@@ -155,6 +165,10 @@ const showNumbersFunction = (buttonNo) => {
       document.querySelector("#display1-input").value = buttonNo.textContent;
       document.querySelector("#display2-input").value = "";
       document.querySelector("#display2-input").style.visibility = "visible";
+    } else if (disp2Value.value === "=" && disp1Value.value[0] === "-") {
+      document.querySelector("#display1-input").value = buttonNo.textContent;
+      document.querySelector("#display2-input").value = "";
+      document.querySelector("#display2-input").style.visibility = "visible";
     } else {
       //but if it is presses after a math symbol it will be appended to the prev value
       document.querySelector("#display1-input").value = displays[0].prevDisplay;
@@ -182,9 +196,10 @@ const showZeroFunction = (buttonNo) => {
       if (disp1Value.value.includes("%")) {
         if (disp1Value.value.endsWith("%")) {
           //if zero pressed after the % sign, the final output will be 0
-          /*document.querySelector("#display1-input").value = disp1Value.value +=
+          localStorage.setItem("beforeZero", disp2Value.value);
+          document.querySelector("#display1-input").value = disp1Value.value +=
             buttonNo.textContent;
-          document.querySelector("#display2-input").value = 0;*/
+          document.querySelector("#display2-input").value = 0;
         } else {
           //console.log("zero not after %");
           const inputValue = disp1Value.value;
@@ -451,7 +466,7 @@ const percentageFunction = (per) => {
         //if the last char is not an operator and not the per sign(i.e the % is placed behind a no)
       } else if (!regex.test(disp1Value.value.slice(-1))) {
         if (disp1Value.value.includes("%")) {
-          //of there is already % in the input field, just divide the output by 100
+          //if there is already % in the input field, just divide the output by 100
           document.querySelector("#display1-input").value = disp1Value.value +=
             per.textContent;
 
@@ -549,6 +564,7 @@ const delFunction = () => {
 const clearAll = () => {
   document.querySelector("#display1-input").value = "";
   document.querySelector("#display2-input").value = "";
+  localStorage.clear();
 };
 
 const buttonsClickFunction = (event) => {

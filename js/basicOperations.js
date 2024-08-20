@@ -441,6 +441,13 @@ const percentageFunction = (per) => {
   let disp1Value = document.querySelector("#display1-input");
   let disp2Value = document.querySelector("#display2-input");
 
+  const operators = {
+    "+": (a, b) => parseFloat(a) + parseFloat(b),
+    "-": (a, b) => parseFloat(a) - parseFloat(b),
+    "*": (a, b) => parseFloat(a) * parseFloat(b),
+    "/": (a, b) => parseFloat(a) / parseFloat(b),
+  };
+
   //if the function is called from the delete function, then the opposite of per is done (*100)
   if (per === "delete") {
     if (disp1Value.value !== "") {
@@ -454,14 +461,44 @@ const percentageFunction = (per) => {
   } else {
     if (disp1Value.value !== "") {
       //if the last char is the per symbol
+      //this is for if a per symbol is placed after another
       if (disp1Value.value.slice(-1) === per.textContent) {
-        //this is for if a per symbol is placed after another
-        document.querySelector("#display1-input").value += per.textContent;
+        const operator = regex.exec(disp1Value.value);
 
-        document.querySelector("#display2-input").value = (
-          parseFloat(disp2Value.value) / 100
-        ).toString();
-        document.querySelector("#display2-input").style.visibility = "visible";
+        //if the input value has an operator before the perecentage is added
+        if (operator) {
+          document.querySelector("#display1-input").value = disp1Value.value +=
+            per.textContent;
+
+          const inputValue = operator.input;
+          const operatorSign = operator[0];
+
+          let operatorIndex = inputValue.lastIndexOf(operatorSign);
+          let noBeforeOperator = inputValue.substring(0, operatorIndex);
+          let noAfterOperator = inputValue.substring(operatorIndex + 1);
+
+          let noOfPercentages = inputValue.split("%").length;
+
+          let calcAfterOperator =
+            parseFloat(noAfterOperator) / 100 ** noOfPercentages;
+
+          let calcValue = operators[operatorSign](
+            noBeforeOperator,
+            calcAfterOperator
+          );
+
+          document.querySelector("#display2-input").value =
+            parseFloat(calcValue).toString();
+        } else {
+          //if there are no operators
+          document.querySelector("#display1-input").value += per.textContent;
+
+          document.querySelector("#display2-input").value = (
+            parseFloat(disp2Value.value) / 100
+          ).toString();
+          document.querySelector("#display2-input").style.visibility =
+            "visible";
+        }
 
         //if the last char is not an operator and not the per sign(i.e the % is placed behind a no)
       } else if (!regex.test(disp1Value.value.slice(-1))) {
@@ -476,16 +513,46 @@ const percentageFunction = (per) => {
           document.querySelector("#display2-input").style.visibility =
             "visible";
 
-          //else if the input does not have % anywhere at all (first percent), divide the original number by 100
+          //else if the input does not have % anywhere at all (first percent)
         } else {
-          document.querySelector("#display1-input").value = disp1Value.value +=
-            per.textContent;
+          const operator = regex.exec(disp1Value.value);
+          //if there is an operator before adding the % (e.g 8+5%)
+          if (operator) {
+            const inputValue = operator.input;
+            const operatorSign = operator[0];
 
-          document.querySelector("#display2-input").value = (
-            parseFloat(disp1Value.value) / 100
-          ).toString();
-          document.querySelector("#display2-input").style.visibility =
-            "visible";
+            let operatorIndex = inputValue.lastIndexOf(operatorSign);
+            let noBeforeOperator = inputValue.substring(0, operatorIndex);
+            let noAfterOperator = inputValue.substring(operatorIndex + 1);
+            let calcAfterOperator = "";
+
+            if (operatorSign === "+" || operatorSign === "-") {
+              calcAfterOperator = (noAfterOperator / 100) * noBeforeOperator;
+            } else {
+              calcAfterOperator = noAfterOperator / 100;
+            }
+
+            let calcValue = operators[operatorSign](
+              noBeforeOperator,
+              calcAfterOperator
+            );
+
+            document.querySelector("#display2-input").value =
+              parseFloat(calcValue).toString();
+            document.querySelector("#display1-input").value =
+              disp1Value.value += per.textContent;
+
+            //if there are no operators, divide the original number by 100
+          } else {
+            document.querySelector("#display1-input").value =
+              disp1Value.value += per.textContent;
+
+            document.querySelector("#display2-input").value = (
+              parseFloat(disp1Value.value) / 100
+            ).toString();
+            document.querySelector("#display2-input").style.visibility =
+              "visible";
+          }
         }
       }
     }

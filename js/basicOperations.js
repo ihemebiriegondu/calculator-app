@@ -70,7 +70,33 @@ const displayResultsOnChangeFunction = () => {
 
     //if there is a number after the operator, update the result else the currValue will be empty
     if (curr.length > 0) {
-      let calcValue = operators[operatorSign](prev, curr);
+      let noOfPercentages = inputValue.split("%").length - 1;
+      let calcAfterOperator = "";
+
+      let calcValue = "";
+
+      console.log(noOfPercentages);
+
+      if (inputValue.endsWith("%")) {
+        if (noOfPercentages > 1) {
+          calcAfterOperator = parseFloat(curr) / 100 ** noOfPercentages;
+
+          calcValue = operators[operatorSign](prev, calcAfterOperator);
+          console.log(">>");
+        } else {
+          console.log("<<");
+          if (operatorSign === "+" || operatorSign === "-") {
+            calcAfterOperator = (parseFloat(curr) / 100) * parseFloat(prev);
+          } else {
+            calcAfterOperator = parseFloat(curr) / 100;
+          }
+          calcValue = operators[operatorSign](prev, calcAfterOperator);
+          console.log(calcAfterOperator);
+        }
+      } else {
+        calcValue = operators[operatorSign](prev, curr);
+      }
+
       if (
         calcValue.toString() === "Infinity" ||
         calcValue.toString() === "-Infinity" ||

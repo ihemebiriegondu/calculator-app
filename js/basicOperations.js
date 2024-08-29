@@ -440,6 +440,8 @@ const percentageFunction = (per) => {
 
   let disp1Value = document.querySelector("#display1-input");
   let disp2Value = document.querySelector("#display2-input");
+  let operator = "";
+  let operatorSign = "";
 
   const operators = {
     "+": (a, b) => parseFloat(a) + parseFloat(b),
@@ -463,7 +465,24 @@ const percentageFunction = (per) => {
       //if the last char is the per symbol
       //this is for if a per symbol is placed after another
       if (disp1Value.value.slice(-1) === per.textContent) {
-        const operator = regex.exec(disp1Value.value);
+        //if the input has a minus in front, the minus wont be counted as an operator
+        if (disp1Value.value[0] === "-") {
+          regex.lastIndex = 1;
+          operator = regex.exec(disp1Value.value);
+
+          //if the input has an exponential, then we start counting the operator sign from after the exponential sign
+        } else if (disp1Value.value.includes("e")) {
+          let indexOfe = disp1Value.value.indexOf("e");
+          let newOperator = regex.exec(
+            disp1Value.value.substring(indexOfe + 2)
+          );
+          if (newOperator) {
+            operatorSign = newOperator[0];
+          }
+          operator = regex.exec(disp1Value.value);
+        } else {
+          operator = regex.exec(disp1Value.value);
+        }
 
         //if the input value has an operator before the perecentage is added
         if (operator) {
@@ -471,7 +490,7 @@ const percentageFunction = (per) => {
             per.textContent;
 
           const inputValue = operator.input;
-          const operatorSign = operator[0];
+          operatorSign = operator[0];
 
           let operatorIndex = inputValue.lastIndexOf(operatorSign);
           let noBeforeOperator = inputValue.substring(0, operatorIndex);
@@ -515,9 +534,28 @@ const percentageFunction = (per) => {
 
           //else if the input does not have % anywhere at all (first percent)
         } else {
-          const operator = regex.exec(disp1Value.value);
+          //if the input has a minus in front, the minus wont be counted as an operator
+          if (disp1Value.value[0] === "-") {
+            regex.lastIndex = 1;
+            operator = regex.exec(disp1Value.value);
+
+            //if the input has an exponential, then we start counting the operator sign from after the exponential sign
+          } else if (disp1Value.value.includes("e")) {
+            let indexOfe = disp1Value.value.indexOf("e");
+            let newOperator = regex.exec(
+              disp1Value.value.substring(indexOfe + 2)
+            );
+            if (newOperator) {
+              operatorSign = newOperator[0];
+            }
+            operator = regex.exec(disp1Value.value);
+          } else {
+            operator = regex.exec(disp1Value.value);
+          }
+
           //if there is an operator before adding the % (e.g 8+5%)
           if (operator) {
+            console.log(operator[0]);
             const inputValue = operator.input;
             const operatorSign = operator[0];
 

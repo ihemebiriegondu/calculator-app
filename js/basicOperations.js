@@ -75,23 +75,18 @@ const displayResultsOnChangeFunction = () => {
 
       let calcValue = "";
 
-      console.log(noOfPercentages);
-
       if (inputValue.endsWith("%")) {
         if (noOfPercentages > 1) {
           calcAfterOperator = parseFloat(curr) / 100 ** noOfPercentages;
 
           calcValue = operators[operatorSign](prev, calcAfterOperator);
-          console.log(">>");
         } else {
-          console.log("<<");
           if (operatorSign === "+" || operatorSign === "-") {
             calcAfterOperator = (parseFloat(curr) / 100) * parseFloat(prev);
           } else {
             calcAfterOperator = parseFloat(curr) / 100;
           }
           calcValue = operators[operatorSign](prev, calcAfterOperator);
-          console.log(calcAfterOperator);
         }
       } else {
         calcValue = operators[operatorSign](prev, curr);
@@ -119,43 +114,79 @@ const showNumbersFunction = (buttonNo) => {
   let disp1Value = document.querySelector("#display1-input");
   let disp2Value = document.querySelector("#display2-input");
 
+  const regex = /[+*\/-]/g;
+  const operators = {
+    "+": (a, b) => parseFloat(a) + parseFloat(b),
+    "-": (a, b) => parseFloat(a) - parseFloat(b),
+  };
+
   //if the input value has % sign
   if (disp1Value.value.includes("%")) {
-    //if the last value is %, multiply the input by the buttonNo
-    if (disp1Value.value.endsWith("%")) {
+    let operator = regex.exec(
+      (disp1Value.value + buttonNo.textContent).slice(
+        1,
+        disp1Value.value.length + 1
+      )
+    );
+
+    if (operator && (operator[0] === "+" || operator[0] === "-")) {
       document.querySelector("#display1-input").value = disp1Value.value +=
         buttonNo.textContent;
 
-      document.querySelector("#display2-input").value =
-        disp2Value.value * buttonNo.textContent;
-    } else {
-      //if the last no is not % (i.e if its a number after another)
-      let indexOfLastPer = disp1Value.value.lastIndexOf("%");
-      let noAfterThePerBeforeAddingButtonNo = disp1Value.value.substring(
-        indexOfLastPer + 1
+      let inputValue = operator.input;
+      let indexOfSign = disp1Value.value.lastIndexOf(operator[0]);
+
+      const noBeforeOperator = disp1Value.value.substring(0, indexOfSign);
+      const noAfterOperator = inputValue.substring(indexOfSign);
+
+      let indexOfPercent = noAfterOperator.lastIndexOf("%");
+      const noBeforePercent = noAfterOperator.substring(0, indexOfPercent);
+      const noAfterPercent = noAfterOperator.substring(indexOfPercent + 1);
+
+      const calcAfterOperator = (noBeforePercent / 100) * noAfterPercent;
+      const calcValue = operators[operator[0]](
+        noBeforeOperator,
+        calcAfterOperator
       );
 
-      document.querySelector("#display1-input").value = disp1Value.value +=
-        buttonNo.textContent;
+      document.querySelector("#display2-input").value = calcValue.toString();
+    } else {
+      //if the last value is %, multiply the input by the buttonNo
+      if (disp1Value.value.endsWith("%")) {
+        document.querySelector("#display1-input").value = disp1Value.value +=
+          buttonNo.textContent;
 
-      let allNosAfterThePer = disp1Value.value.substring(indexOfLastPer + 1);
-
-      //console.log(localStorage.getItem("beforeZero"));
-      if (noAfterThePerBeforeAddingButtonNo === "0") {
         document.querySelector("#display2-input").value =
-          localStorage.getItem("beforeZero") * buttonNo.textContent;
-      } else if (noAfterThePerBeforeAddingButtonNo === "0.") {
-        if (localStorage.getItem("beforeZero") === null) {
+          disp2Value.value * buttonNo.textContent;
+      } else {
+        //if the last no is not % (i.e if its a number after another)
+        let indexOfLastPer = disp1Value.value.lastIndexOf("%");
+        let noAfterThePerBeforeAddingButtonNo = disp1Value.value.substring(
+          indexOfLastPer + 1
+        );
+
+        document.querySelector("#display1-input").value = disp1Value.value +=
+          buttonNo.textContent;
+
+        let allNosAfterThePer = disp1Value.value.substring(indexOfLastPer + 1);
+
+        //console.log(localStorage.getItem("beforeZero"));
+        if (noAfterThePerBeforeAddingButtonNo === "0") {
           document.querySelector("#display2-input").value =
-            (disp2Value.value / 10) * buttonNo.textContent;
+            localStorage.getItem("beforeZero") * buttonNo.textContent;
+        } else if (noAfterThePerBeforeAddingButtonNo === "0.") {
+          if (localStorage.getItem("beforeZero") === null) {
+            document.querySelector("#display2-input").value =
+              (disp2Value.value / 10) * buttonNo.textContent;
+          } else {
+            document.querySelector("#display2-input").value =
+              (localStorage.getItem("beforeZero") / 10) * buttonNo.textContent;
+          }
         } else {
           document.querySelector("#display2-input").value =
-            (localStorage.getItem("beforeZero") / 10) * buttonNo.textContent;
+            (disp2Value.value / noAfterThePerBeforeAddingButtonNo) *
+            allNosAfterThePer;
         }
-      } else {
-        document.querySelector("#display2-input").value =
-          (disp2Value.value / noAfterThePerBeforeAddingButtonNo) *
-          allNosAfterThePer;
       }
     }
 
@@ -184,7 +215,6 @@ const showNumbersFunction = (buttonNo) => {
     }
 
     //update the values
-    const regex = /[+*\/-]/g;
 
     //if the equal to button has been pressed and there is no math symbol in the output, the prev input will start afresh from the buttonNo
     if (disp2Value.value === "=" && !regex.test(disp1Value.value)) {
@@ -581,7 +611,6 @@ const percentageFunction = (per) => {
 
           //if there is an operator before adding the % (e.g 8+5%)
           if (operator) {
-            console.log(operator[0]);
             const inputValue = operator.input;
             const operatorSign = operator[0];
 

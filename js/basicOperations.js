@@ -75,18 +75,36 @@ const displayResultsOnChangeFunction = () => {
 
       let calcValue = "";
 
-      if (inputValue.endsWith("%")) {
-        if (noOfPercentages > 1) {
-          calcAfterOperator = parseFloat(curr) / 100 ** noOfPercentages;
+      if (inputValue.includes("%")) {
+        if (inputValue.endsWith("%")) {
+          if (noOfPercentages > 1) {
+            calcAfterOperator = parseFloat(curr) / 100 ** noOfPercentages;
 
-          calcValue = operators[operatorSign](prev, calcAfterOperator);
-        } else {
-          if (operatorSign === "+" || operatorSign === "-") {
-            calcAfterOperator = (parseFloat(curr) / 100) * parseFloat(prev);
+            calcValue = operators[operatorSign](prev, calcAfterOperator);
           } else {
-            calcAfterOperator = parseFloat(curr) / 100;
+            if (operatorSign === "+" || operatorSign === "-") {
+              calcAfterOperator = (parseFloat(curr) / 100) * parseFloat(prev);
+            } else {
+              calcAfterOperator = parseFloat(curr) / 100;
+            }
+            calcValue = operators[operatorSign](prev, calcAfterOperator);
           }
-          calcValue = operators[operatorSign](prev, calcAfterOperator);
+        } else {
+          if (inputValue.slice(-2) === "%0") {
+            calcValue = prev;
+          } else {
+            let indexOfPercent = curr.lastIndexOf("%");
+            const noBeforePercent = curr.substring(0, indexOfPercent);
+            const noAfterPercent = curr.substring(
+              indexOfPercent + 1
+            );
+
+            calcAfterOperator = (noBeforePercent / 100) * noAfterPercent;
+            calcValue = operators[operator[0]](
+              prev,
+              calcAfterOperator
+            );
+          }
         }
       } else {
         calcValue = operators[operatorSign](prev, curr);
@@ -298,20 +316,50 @@ const showZeroFunction = (buttonNo) => {
       //but if it is presses after a math symbol it will be appended to the prev value
       document.querySelector("#display1-input").value = buttonNo.textContent;
     } else {
-      const inputValue = operator.input;
-      const operatorSign = operator[0];
+      if (disp1Value.value[0] === "-") {
+        if (disp1Value.value.endsWith("%")) {
+          //if zero pressed after the % sign, the final output will be 0
+          localStorage.setItem("beforeZero", disp2Value.value);
+          if (disp1Value.value !== "-0") {
+            document.querySelector("#display1-input").value =
+              disp1Value.value += buttonNo.textContent;
+          }
+          document.querySelector("#display2-input").value = 0;
+        } else {
+          //console.log("zero not after %");
+          const inputValue = disp1Value.value;
+          let noBeforeSign = inputValue.lastIndexOf("%");
 
-      //get the math operator used, and the number after the operator was used
-      let noBeforeSign = inputValue.lastIndexOf(operatorSign);
-      let curr = inputValue.substring(noBeforeSign + 1);
+          //if zero is pressed and the number after the % is not all zero, then zero is appended to the disp1Value
+          //and the disp2Value is multiplied by 10 (for each 0 added)
+          if (inputValue.substring(noBeforeSign + 1) !== "0") {
+            if (disp1Value.value !== "-0") {
+              document.querySelector("#display1-input").value =
+                disp1Value.value += buttonNo.textContent;
+            }
+            if (!inputValue.substring(noBeforeSign + 1).includes(".")) {
+              document.querySelector("#display2-input").value =
+                disp2Value.value * 10;
+            }
+          }
+        }
+      } else {
+        const inputValue = operator.input;
+        const operatorSign = operator[0];
 
-      //if the only value after the operator is zero, no other zero will be added. else only one zero is added
-      if (disp1Value.value.endsWith(operator[0])) {
-        document.querySelector("#display1-input").value = disp1Value.value +=
-          buttonNo.textContent;
-      } else if (curr !== "0") {
-        document.querySelector("#display1-input").value = disp1Value.value +=
-          buttonNo.textContent;
+        //get the math operator used, and the number after the operator was used
+        let noBeforeSign = inputValue.lastIndexOf(operatorSign);
+        let curr = inputValue.substring(noBeforeSign + 1);
+        let noAfterPer = inputValue.substring(inputValue.lastIndexOf("%") + 1);
+
+        //if the only value after the operator is zero, no other zero will be added. else only one zero is added
+        if (disp1Value.value.endsWith(operator[0])) {
+          document.querySelector("#display1-input").value = disp1Value.value +=
+            buttonNo.textContent;
+        } else if (curr !== "0" && noAfterPer !== "0") {
+          document.querySelector("#display1-input").value = disp1Value.value +=
+            buttonNo.textContent;
+        }
       }
     }
   }

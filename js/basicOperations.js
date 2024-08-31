@@ -95,15 +95,13 @@ const displayResultsOnChangeFunction = () => {
           } else {
             let indexOfPercent = curr.lastIndexOf("%");
             const noBeforePercent = curr.substring(0, indexOfPercent);
-            const noAfterPercent = curr.substring(
-              indexOfPercent + 1
-            );
+            const noAfterPercent = curr.substring(indexOfPercent + 1);
 
-            calcAfterOperator = (noBeforePercent / 100) * noAfterPercent;
-            calcValue = operators[operator[0]](
-              prev,
-              calcAfterOperator
-            );
+            calcAfterOperator =
+              (parseFloat(noBeforePercent) /
+                100 ** parseFloat(noOfPercentages)) *
+              noAfterPercent;
+            calcValue = operators[operator[0]](prev, calcAfterOperator);
           }
         }
       } else {
@@ -160,8 +158,11 @@ const showNumbersFunction = (buttonNo) => {
       let indexOfPercent = noAfterOperator.lastIndexOf("%");
       const noBeforePercent = noAfterOperator.substring(0, indexOfPercent);
       const noAfterPercent = noAfterOperator.substring(indexOfPercent + 1);
+      const noOfPercentage = noAfterOperator.split("%").length - 1;
 
-      const calcAfterOperator = (noBeforePercent / 100) * noAfterPercent;
+      const calcAfterOperator =
+        (parseFloat(noBeforePercent) / 100 ** parseFloat(noOfPercentage)) *
+        noAfterPercent;
       const calcValue = operators[operator[0]](
         noBeforeOperator,
         calcAfterOperator

@@ -158,10 +158,10 @@ const showNumbersFunction = (buttonNo) => {
       let indexOfPercent = noAfterOperator.lastIndexOf("%");
       const noBeforePercent = noAfterOperator.substring(0, indexOfPercent);
       const noAfterPercent = noAfterOperator.substring(indexOfPercent + 1);
-      const noOfPercentage = noAfterOperator.split("%").length - 1;
+      const noOfPercentages = noAfterOperator.split("%").length - 1;
 
       const calcAfterOperator =
-        (parseFloat(noBeforePercent) / 100 ** parseFloat(noOfPercentage)) *
+        (parseFloat(noBeforePercent) / 100 ** parseFloat(noOfPercentages)) *
         noAfterPercent;
       const calcValue = operators[operator[0]](
         noBeforeOperator,
@@ -169,6 +169,7 @@ const showNumbersFunction = (buttonNo) => {
       );
 
       document.querySelector("#display2-input").value = calcValue.toString();
+      localStorage.setItem("calcAfterOperator", calcAfterOperator);
     } else {
       //if the last value is %, multiply the input by the buttonNo
       if (disp1Value.value.endsWith("%")) {
@@ -589,7 +590,7 @@ const percentageFunction = (per) => {
           operator = regex.exec(disp1Value.value);
         }
 
-        //if the input value has an operator before the perecentage is added
+        //if the input value has an operator before the perecentage is added (8+6%%)
         if (operator) {
           document.querySelector("#display1-input").value = disp1Value.value +=
             per.textContent;
@@ -627,16 +628,47 @@ const percentageFunction = (per) => {
         //if the last char is not an operator and not the per sign(i.e the % is placed behind a no)
       } else if (!regex.test(disp1Value.value.slice(-1))) {
         if (disp1Value.value.includes("%")) {
-          //if there is already % in the input field, just divide the output by 100
+          //if there is already % in the input field
           document.querySelector("#display1-input").value = disp1Value.value +=
             per.textContent;
 
+          /*if (disp1Value.value[0] === "-") {
+            regex.lastIndex = 1;
+            operator = regex.exec(disp1Value.value);
+          } else {
+            operator = regex.exec(disp1Value.value);
+          }
+
+          //if there is an operator in the input field, but the operator is not the first number(i.e not a -ve no)
+          if (operator && (operator[0] === "+" || operator[0] === "-")) {
+            let inputValue = operator.input;
+
+            let indexOfSign = inputValue.lastIndexOf(operator[0]);
+            console.log(indexOfSign);
+
+            let noBeforeOperator = inputValue.substring(0, indexOfSign);
+            let calcAfterOperator =
+              parseFloat(localStorage.getItem("calcAfterOperator")) / 100;
+            console.log(noBeforeOperator);
+            console.log(calcAfterOperator);
+
+            let calcValue = operators[operator[0]](
+              noBeforeOperator,
+              calcAfterOperator
+            );
+
+            document.querySelector("#display2-input").value =
+              parseFloat(calcValue).toString();
+          } else {*/
+          //no operator at all (or neg value), just divide the output by 100
           document.querySelector("#display2-input").value = (
             parseFloat(disp2Value.value) / 100
           ).toString();
+
           document.querySelector("#display2-input").style.visibility =
             "visible";
 
+          console.log("dhdh");
           //else if the input does not have % anywhere at all (first percent)
         } else {
           //if the input has a minus in front, the minus wont be counted as an operator

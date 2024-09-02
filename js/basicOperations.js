@@ -106,29 +106,24 @@ const displayResultsOnChangeFunction = () => {
             calcValue = operators[operatorSign](prev, calcAfterOperator);
           }
         } else {
-          if (inputValue.slice(-2) === "%0") {
-            calcValue = prev;
-            //if op is * or / or +,-
-          } else {
-            let indexOfPercent = curr.lastIndexOf("%");
-            const noAfterLastPercent = curr.substring(indexOfPercent + 1);
+          let indexOfPercent = curr.lastIndexOf("%");
+          const noAfterLastPercent = curr.substring(indexOfPercent + 1);
 
-            calcAfterOperator = parseFloat(noAfterLastPercent);
+          calcAfterOperator = parseFloat(noAfterLastPercent);
 
-            //check for all occurences of %
-            const matches = [...curr.matchAll(/(\d+(?:\.\d+)?)(%+)/g)];
+          //check for all occurences of %
+          const matches = [...curr.matchAll(/(\d+(?:\.\d+)?)(%+)/g)];
 
-            matches.forEach((match) => {
-              const nosBeforePercent = parseFloat(match[1]);
-              const noOfPercentages = match[2].length;
+          matches.forEach((match) => {
+            const nosBeforePercent = parseFloat(match[1]);
+            const noOfPercentages = match[2].length;
 
-              const individualCalc =
-                parseFloat(nosBeforePercent) / 100 ** noOfPercentages;
-              calcAfterOperator *= individualCalc;
-            });
+            const individualCalc =
+              parseFloat(nosBeforePercent) / 100 ** noOfPercentages;
+            calcAfterOperator *= individualCalc;
+          });
 
-            calcValue = operators[operator[0]](prev, calcAfterOperator);
-          }
+          calcValue = operators[operator[0]](prev, calcAfterOperator);
         }
       } else {
         calcValue = operators[operatorSign](prev, curr);
@@ -440,10 +435,25 @@ const showDecimalPointFunction = (decPoint) => {
       let curr = inputValue.substring(noBeforeSign + 1);
 
       //if there is a number after the operator and the number does not already have a decimal point
-      if (curr.length > 0 && !curr.includes(decPoint.textContent)) {
-        document.querySelector("#display1-input").value = disp1Value.value +=
-          decPoint.textContent;
-      } else if (curr.length <= 0) {
+      if (curr.length > 0) {
+        if (disp1Value.value.includes("%")) {
+          let indexOfLastPer = inputValue.lastIndexOf("%");
+          let noAfterLastPercent = inputValue.substring(indexOfLastPer + 1);
+
+          if (
+            noAfterLastPercent &&
+            !noAfterLastPercent.includes(decPoint.textContent)
+          ) {
+            document.querySelector("#display1-input").value =
+              disp1Value.value += decPoint.textContent;
+          }
+        } else {
+          if (!curr.includes(decPoint.textContent)) {
+            document.querySelector("#display1-input").value =
+              disp1Value.value += decPoint.textContent;
+          }
+        }
+      } else {
         document.querySelector("#display1-input").value = disp1Value.value +=
           "0.";
       }

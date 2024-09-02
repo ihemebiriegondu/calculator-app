@@ -78,7 +78,23 @@ const displayResultsOnChangeFunction = () => {
       if (inputValue.includes("%")) {
         if (inputValue.endsWith("%")) {
           if (noOfPercentages > 1) {
-            calcAfterOperator = parseFloat(curr) / 100 ** noOfPercentages;
+            let indexOfPercent = curr.lastIndexOf("%");
+            const noAfterLastPercent = curr.substring(indexOfPercent + 1);
+
+            calcAfterOperator =
+              noAfterLastPercent === "" ? 1 : parseFloat(noAfterLastPercent);
+
+            //check for all occurences of %
+            const matches = [...curr.matchAll(/(\d+(?:\.\d+)?)(%+)/g)];
+
+            matches.forEach((match) => {
+              const nosBeforePercent = parseFloat(match[1]);
+              const perNumber = match[2].length;
+
+              const individualCalc =
+                parseFloat(nosBeforePercent) / 100 ** perNumber;
+              calcAfterOperator *= parseFloat(individualCalc);
+            });
 
             calcValue = operators[operatorSign](prev, calcAfterOperator);
           } else {
@@ -92,15 +108,25 @@ const displayResultsOnChangeFunction = () => {
         } else {
           if (inputValue.slice(-2) === "%0") {
             calcValue = prev;
+            //if op is * or / or +,-
           } else {
             let indexOfPercent = curr.lastIndexOf("%");
-            const noBeforePercent = curr.substring(0, indexOfPercent);
-            const noAfterPercent = curr.substring(indexOfPercent + 1);
+            const noAfterLastPercent = curr.substring(indexOfPercent + 1);
 
-            calcAfterOperator =
-              (parseFloat(noBeforePercent) /
-                100 ** parseFloat(noOfPercentages)) *
-              noAfterPercent;
+            calcAfterOperator = parseFloat(noAfterLastPercent);
+
+            //check for all occurences of %
+            const matches = [...curr.matchAll(/(\d+(?:\.\d+)?)(%+)/g)];
+
+            matches.forEach((match) => {
+              const nosBeforePercent = parseFloat(match[1]);
+              const noOfPercentages = match[2].length;
+
+              const individualCalc =
+                parseFloat(nosBeforePercent) / 100 ** noOfPercentages;
+              calcAfterOperator *= individualCalc;
+            });
+
             calcValue = operators[operator[0]](prev, calcAfterOperator);
           }
         }
@@ -156,20 +182,28 @@ const showNumbersFunction = (buttonNo) => {
       const noAfterOperator = inputValue.substring(indexOfSign);
 
       let indexOfPercent = noAfterOperator.lastIndexOf("%");
-      const noBeforePercent = noAfterOperator.substring(0, indexOfPercent);
-      const noAfterPercent = noAfterOperator.substring(indexOfPercent + 1);
-      const noOfPercentages = noAfterOperator.split("%").length - 1;
+      const noAfterLastPercent = noAfterOperator.substring(indexOfPercent + 1);
 
-      const calcAfterOperator =
-        (parseFloat(noBeforePercent) / 100 ** parseFloat(noOfPercentages)) *
-        noAfterPercent;
-      const calcValue = operators[operator[0]](
+      let calcAfterOperator = parseFloat(noAfterLastPercent);
+
+      //check for all occurences of %
+      const matches = [...noAfterOperator.matchAll(/(\d+(?:\.\d+)?)(%+)/g)];
+
+      matches.forEach((match) => {
+        const nosBeforePercent = parseFloat(match[1]);
+        const noOfPercentages = match[2].length;
+
+        const individualCalc =
+          parseFloat(nosBeforePercent) / 100 ** noOfPercentages;
+        calcAfterOperator *= individualCalc;
+      });
+
+      let calcValue = operators[operator[0]](
         noBeforeOperator,
         calcAfterOperator
       );
 
       document.querySelector("#display2-input").value = calcValue.toString();
-      localStorage.setItem("calcAfterOperator", calcAfterOperator);
     } else {
       //if the last value is %, multiply the input by the buttonNo
       if (disp1Value.value.endsWith("%")) {
@@ -600,18 +634,26 @@ const percentageFunction = (per) => {
 
           let operatorIndex = inputValue.lastIndexOf(operatorSign);
           let noBeforeOperator = inputValue.substring(0, operatorIndex);
-          let noAfterOperator = inputValue.substring(operatorIndex + 1);
+          let noAfterOperator = disp1Value.value.substring(operatorIndex + 1);
 
-          let noOfPercentages = inputValue.split("%").length;
+          let calcAfterOperator = 1;
 
-          let calcAfterOperator =
-            parseFloat(noAfterOperator) / 100 ** noOfPercentages;
+          //check for all occurences of %
+          const matches = [...noAfterOperator.matchAll(/(\d+(?:\.\d+)?)(%+)/g)];
+
+          matches.forEach((match) => {
+            const nosBeforePercent = parseFloat(match[1]);
+            const noOfPercentages = match[2].length;
+
+            const individualCalc =
+              parseFloat(nosBeforePercent) / 100 ** noOfPercentages;
+            calcAfterOperator *= individualCalc;
+          });
 
           let calcValue = operators[operatorSign](
             noBeforeOperator,
             calcAfterOperator
           );
-
           document.querySelector("#display2-input").value =
             parseFloat(calcValue).toString();
         } else {
@@ -632,7 +674,7 @@ const percentageFunction = (per) => {
           document.querySelector("#display1-input").value = disp1Value.value +=
             per.textContent;
 
-          /*if (disp1Value.value[0] === "-") {
+          if (disp1Value.value[0] === "-") {
             regex.lastIndex = 1;
             operator = regex.exec(disp1Value.value);
           } else {
@@ -640,35 +682,46 @@ const percentageFunction = (per) => {
           }
 
           //if there is an operator in the input field, but the operator is not the first number(i.e not a -ve no)
-          if (operator && (operator[0] === "+" || operator[0] === "-")) {
-            let inputValue = operator.input;
+          if (operator) {
+            const inputValue = operator.input;
+            operatorSign = operator[0];
 
-            let indexOfSign = inputValue.lastIndexOf(operator[0]);
-            console.log(indexOfSign);
+            let operatorIndex = inputValue.lastIndexOf(operatorSign);
+            let noBeforeOperator = inputValue.substring(0, operatorIndex);
+            let noAfterOperator = inputValue.substring(operatorIndex + 1);
 
-            let noBeforeOperator = inputValue.substring(0, indexOfSign);
-            let calcAfterOperator =
-              parseFloat(localStorage.getItem("calcAfterOperator")) / 100;
-            console.log(noBeforeOperator);
-            console.log(calcAfterOperator);
+            let calcAfterOperator = 1;
 
-            let calcValue = operators[operator[0]](
+            //check for all occurences of %
+            const matches = [
+              ...noAfterOperator.matchAll(/(\d+(?:\.\d+)?)(%+)/g),
+            ];
+
+            matches.forEach((match) => {
+              const nosBeforePercent = parseFloat(match[1]);
+              const noOfPercentages = match[2].length;
+
+              const individualCalc =
+                parseFloat(nosBeforePercent) / 100 ** noOfPercentages;
+              calcAfterOperator *= individualCalc;
+            });
+
+            let calcValue = operators[operatorSign](
               noBeforeOperator,
               calcAfterOperator
             );
-
             document.querySelector("#display2-input").value =
               parseFloat(calcValue).toString();
-          } else {*/
-          //no operator at all (or neg value), just divide the output by 100
-          document.querySelector("#display2-input").value = (
-            parseFloat(disp2Value.value) / 100
-          ).toString();
+          } else {
+            //no operator at all (or neg value), just divide the output by 100
+            document.querySelector("#display2-input").value = (
+              parseFloat(disp2Value.value) / 100
+            ).toString();
 
-          document.querySelector("#display2-input").style.visibility =
-            "visible";
+            document.querySelector("#display2-input").style.visibility =
+              "visible";
+          }
 
-          console.log("dhdh");
           //else if the input does not have % anywhere at all (first percent)
         } else {
           //if the input has a minus in front, the minus wont be counted as an operator

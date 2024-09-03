@@ -892,30 +892,51 @@ const buttonsClickFunction = (event) => {
   if (event.key) {
     let keyType = event.key;
 
+    //get all possible keys (to trigger individual key function)
     const keys = document.querySelectorAll(".keys");
-    const acceptedKeys = ["0", ".", "%"];
+
     const numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
     const operators = ["+", "-", "/", "*"];
 
     if (numbers.includes(keyType)) {
-      console.log("is a number");
+      //console.log("is a number");
       keys.forEach((key) => {
         if (key.textContent === keyType) {
-          console.log(key);
           showNumbersFunction(key);
         }
       });
     } else if (operators.includes(keyType)) {
-      console.log("is an operator");
+      //console.log("is an operator");
       keys.forEach((key) => {
         if (key.textContent === keyType) {
-          console.log(key);
           showOperatorFunction(key);
         }
       });
+    } else if (keyType === "0") {
+      keys.forEach((key) => {
+        if (key.textContent === keyType) {
+          showZeroFunction(key);
+        }
+      });
+    } else if (keyType === ".") {
+      keys.forEach((key) => {
+        if (key.textContent === keyType) {
+          showDecimalPointFunction(key);
+        }
+      });
+    } else if (keyType === "%") {
+      keys.forEach((key) => {
+        if (key.textContent === keyType) {
+          percentageFunction(key);
+        }
+      });
+    } else if (keyType === "Backspace") {
+      delFunction();
+    } else if (keyType === "Enter") {
+      equalsToFunction("equals");
+    } else if (keyType === "Escape") {
+      clearAll();
     }
-
-    console.log(event.key);
   } else {
     let buttonType = event.target;
 

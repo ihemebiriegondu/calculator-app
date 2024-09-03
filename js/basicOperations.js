@@ -255,13 +255,13 @@ const showNumbersFunction = (buttonNo) => {
     ];
 
     //reduce fontsize as input values becomes more and also setting max no of values to 30
-    const input1length = displays[0].prevDisplay.length;
+    /*const input1length = displays[0].prevDisplay.length;
     if (input1length >= 14 && input1length < 30) {
       const fontSize = Math.max(60 - input1length * 0.9, 40);
       disp1Value.style.fontSize = fontSize + "px";
     } else if (input1length > 30) {
       displays[0].prevDisplay = displays[0].prevDisplay.slice(0, 30);
-    }
+    }*/
 
     //update the values
 
@@ -481,7 +481,14 @@ const showDecimalPointFunction = (decPoint) => {
       regex.test(disp1Value.value.slice(-1)) ||
       disp1Value.value.endsWith("%")
     ) {
-      //console.log("last value is an operator");
+      //console.log("last value is an operator or %");
+
+      if (disp1Value.value.endsWith("%")) {
+        //if 0. pressed after the % sign, the final output will be 0
+        localStorage.setItem("beforeZero", disp2Value.value);
+        document.querySelector("#display2-input").value = "0";
+      }
+
       document.querySelector("#display1-input").value = disp1Value.value +=
         "0.";
     } else {
@@ -881,29 +888,71 @@ const clearAll = () => {
 };
 
 const buttonsClickFunction = (event) => {
-  let buttonType = event.target;
+  //if the function is called by keyboard click
+  if (event.key) {
+    let keyType = event.key;
 
-  //console.log(buttonType.classList);
-  if (buttonType.classList.contains("noKeys")) {
-    showNumbersFunction(buttonType);
-  } else if (buttonType.classList.contains("zeroKey")) {
-    showZeroFunction(buttonType);
-  } else if (buttonType.classList.contains("pointKey")) {
-    showDecimalPointFunction(buttonType);
-  } else if (buttonType.classList.contains("opkeys")) {
-    showOperatorFunction(buttonType);
-  } else if (buttonType.classList.contains("perKey")) {
-    percentageFunction(buttonType);
-  } else if (buttonType.classList.contains("delKey")) {
-    delFunction();
-  } else if (buttonType.classList.contains("acKey")) {
-    clearAll();
-  } else if (buttonType.classList.contains("equalsKey")) {
-    equalsToFunction("equals");
+    const keys = document.querySelectorAll(".keys");
+    const acceptedKeys = ["0", ".", "%"];
+    const numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+    const operators = ["+", "-", "/", "*"];
+
+    if (numbers.includes(keyType)) {
+      console.log("is a number");
+      keys.forEach((key) => {
+        if (key.textContent === keyType) {
+          console.log(key);
+          showNumbersFunction(key);
+        }
+      });
+    } else if (operators.includes(keyType)) {
+      console.log("is an operator");
+      keys.forEach((key) => {
+        if (key.textContent === keyType) {
+          console.log(key);
+          showOperatorFunction(key);
+        }
+      });
+    }
+
+    console.log(event.key);
+  } else {
+    let buttonType = event.target;
+
+    //console.log(buttonType.classList);
+    if (buttonType.classList.contains("noKeys")) {
+      showNumbersFunction(buttonType);
+    } else if (buttonType.classList.contains("zeroKey")) {
+      showZeroFunction(buttonType);
+    } else if (buttonType.classList.contains("pointKey")) {
+      showDecimalPointFunction(buttonType);
+    } else if (buttonType.classList.contains("opkeys")) {
+      showOperatorFunction(buttonType);
+    } else if (buttonType.classList.contains("perKey")) {
+      percentageFunction(buttonType);
+    } else if (buttonType.classList.contains("delKey")) {
+      delFunction();
+    } else if (buttonType.classList.contains("acKey")) {
+      clearAll();
+    } else if (buttonType.classList.contains("equalsKey")) {
+      equalsToFunction("equals");
+    }
   }
 };
 
+//update input from the app keys
 const keys = document.querySelectorAll(".keys");
 keys.forEach((key) => {
   key.addEventListener("click", buttonsClickFunction);
+});
+
+//update input from keyboard
+const disp1Value = document.querySelector("#display1-input");
+disp1Value.addEventListener("keydown", buttonsClickFunction);
+
+//this makes the display1Value input field to always be onfocus, so that it can always be updated by the keyboard
+document.addEventListener("click", (event) => {
+  if (event.target !== disp1Value) {
+    disp1Value.focus();
+  }
 });

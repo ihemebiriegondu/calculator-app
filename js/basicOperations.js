@@ -1,13 +1,31 @@
 //called when the equalto sign is pressed
 const equalsToFunction = (caller) => {
   let disp2Value = document.querySelector("#display2-input");
+  let disp1Value = document.querySelector("#display1-input");
 
-  //if the function is called by the equakTo button
+  let allCalcArray = "";
+  if (localStorage.getItem("allCalcArray") === null) {
+    allCalcArray = [];
+  } else {
+    allCalcArray = JSON.parse(localStorage.getItem("allCalcArray"));
+  }
+
+  //if the function is called by the equalTo button
   if (caller === "equals") {
     if (disp2Value.value !== "" && disp2Value.value !== "=") {
+      //create an object of input and output(for the recall functioning)
+      const allCalc = {
+        calcInput: disp1Value.value,
+        calcOutput: disp2Value.value,
+      };
+      //append the new object
+      allCalcArray.push(allCalc);
+
       document.querySelector("#display1-input").value = disp2Value.value;
       document.querySelector("#display2-input").value = "=";
       document.querySelector("#display2-input").style.visibility = "hidden";
+
+      localStorage.setItem("allCalcArray", JSON.stringify(allCalcArray));
     }
   } else {
     //if the function is called in the showOperator function
@@ -17,7 +35,7 @@ const equalsToFunction = (caller) => {
       document.querySelector("#display2-input").value = "";
     }
   }
-  localStorage.clear();
+  localStorage.removeItem("beforeZero");
 };
 
 //changes as the input values changes
@@ -884,79 +902,86 @@ const delFunction = () => {
 const clearAll = () => {
   document.querySelector("#display1-input").value = "";
   document.querySelector("#display2-input").value = "";
-  localStorage.clear();
+  localStorage.removeItem("beforeZero");
 };
 
 const buttonsClickFunction = (event) => {
-  //if the function is called by keyboard click
-  if (event.key) {
-    let keyType = event.key;
+  //if the recallDiv is not opened
+  if (
+    !document
+      .querySelector("#recall-key")
+      .classList.contains("clickedRecallKey")
+  ) {
+    //if the function is called by keyboard click
+    if (event.key) {
+      let keyType = event.key;
 
-    //get all possible keys (to trigger individual key function)
-    const keys = document.querySelectorAll(".keys");
+      //get all possible keys (to trigger individual key function)
+      const keys = document.querySelectorAll(".keys");
 
-    const numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
-    const operators = ["+", "-", "/", "*"];
+      const numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+      const operators = ["+", "-", "/", "*"];
 
-    if (numbers.includes(keyType)) {
-      //console.log("is a number");
-      keys.forEach((key) => {
-        if (key.textContent === keyType) {
-          showNumbersFunction(key);
-        }
-      });
-    } else if (operators.includes(keyType)) {
-      //console.log("is an operator");
-      keys.forEach((key) => {
-        if (key.textContent === keyType) {
-          showOperatorFunction(key);
-        }
-      });
-    } else if (keyType === "0") {
-      keys.forEach((key) => {
-        if (key.textContent === keyType) {
-          showZeroFunction(key);
-        }
-      });
-    } else if (keyType === ".") {
-      keys.forEach((key) => {
-        if (key.textContent === keyType) {
-          showDecimalPointFunction(key);
-        }
-      });
-    } else if (keyType === "%") {
-      keys.forEach((key) => {
-        if (key.textContent === keyType) {
-          percentageFunction(key);
-        }
-      });
-    } else if (keyType === "Backspace") {
-      delFunction();
-    } else if (keyType === "Enter") {
-      equalsToFunction("equals");
-    } else if (keyType === "Escape") {
-      clearAll();
-    }
-  } else {
-    let buttonType = event.target;
+      if (numbers.includes(keyType)) {
+        //console.log("is a number");
+        keys.forEach((key) => {
+          if (key.textContent === keyType) {
+            showNumbersFunction(key);
+          }
+        });
+      } else if (operators.includes(keyType)) {
+        //console.log("is an operator");
+        keys.forEach((key) => {
+          if (key.textContent === keyType) {
+            showOperatorFunction(key);
+          }
+        });
+      } else if (keyType === "0") {
+        keys.forEach((key) => {
+          if (key.textContent === keyType) {
+            showZeroFunction(key);
+          }
+        });
+      } else if (keyType === ".") {
+        keys.forEach((key) => {
+          if (key.textContent === keyType) {
+            showDecimalPointFunction(key);
+          }
+        });
+      } else if (keyType === "%") {
+        keys.forEach((key) => {
+          if (key.textContent === keyType) {
+            percentageFunction(key);
+          }
+        });
+      } else if (keyType === "Backspace") {
+        delFunction();
+      } else if (keyType === "Enter") {
+        equalsToFunction("equals");
+      } else if (keyType === "Escape") {
+        clearAll();
+      }
+    } else {
+      let buttonType = event.target;
 
-    //console.log(buttonType.classList);
-    if (buttonType.classList.contains("noKeys")) {
-      showNumbersFunction(buttonType);
-    } else if (buttonType.classList.contains("zeroKey")) {
-      showZeroFunction(buttonType);
-    } else if (buttonType.classList.contains("pointKey")) {
-      showDecimalPointFunction(buttonType);
-    } else if (buttonType.classList.contains("opkeys")) {
-      showOperatorFunction(buttonType);
-    } else if (buttonType.classList.contains("perKey")) {
-      percentageFunction(buttonType);
-    } else if (buttonType.classList.contains("delKey")) {
-      delFunction();
-    } else if (buttonType.classList.contains("acKey")) {
-      clearAll();
-    } else if (buttonType.classList.contains("equalsKey")) {
-      equalsToFunction("equals");
+      //console.log(buttonType.classList);
+      if (buttonType.classList.contains("noKeys")) {
+        showNumbersFunction(buttonType);
+      } else if (buttonType.classList.contains("zeroKey")) {
+        showZeroFunction(buttonType);
+      } else if (buttonType.classList.contains("pointKey")) {
+        showDecimalPointFunction(buttonType);
+      } else if (buttonType.classList.contains("opkeys")) {
+        showOperatorFunction(buttonType);
+      } else if (buttonType.classList.contains("perKey")) {
+        percentageFunction(buttonType);
+      } else if (buttonType.classList.contains("delKey")) {
+        delFunction();
+      } else if (buttonType.classList.contains("acKey")) {
+        clearAll();
+      } else if (buttonType.classList.contains("equalsKey")) {
+        equalsToFunction("equals");
+      }
     }
   }
 };
@@ -977,3 +1002,74 @@ document.addEventListener("click", (event) => {
     disp1Value.focus();
   }
 });
+
+//recall functions
+
+const recallFunction = (event) => {
+  document.querySelector("#display2-input").style.visibility = "visible";
+
+  let recallTarget = event.target;
+  if (recallTarget.classList.contains("recallDivs")) {
+    let disp2Value = recallTarget.children[1].textContent;
+    document.querySelector("#display1-input").value =
+      recallTarget.children[0].textContent;
+    document.querySelector("#display2-input").value = disp2Value.substring(
+      1,
+      disp1Value.length
+    );
+  } else if (recallTarget.classList.contains("recallInputs")) {
+    let disp2Value = recallTarget.parentElement.children[1].textContent;
+    document.querySelector("#display1-input").value = recallTarget.textContent;
+    document.querySelector("#display2-input").value = disp2Value.substring(
+      1,
+      disp1Value.length
+    );
+  } else if (recallTarget.classList.contains("recallOutputs")) {
+    let disp2Value = recallTarget.textContent;
+    document.querySelector("#display1-input").value =
+      recallTarget.parentElement.children[0].textContent;
+    document.querySelector("#display2-input").value = disp2Value.substring(
+      1,
+      disp1Value.length
+    );
+  }
+};
+
+const toggleRecallDiv = () => {
+  document
+    .querySelector("#recallContent")
+    .classList.toggle("showRecallContent");
+  document.querySelector("#recall-key").classList.toggle("clickedRecallKey");
+
+  const allCalcArray = JSON.parse(localStorage.getItem("allCalcArray"));
+  const recallContentBox = document.querySelector("#theContents");
+  recallContentBox.innerHTML = "";
+
+  if (allCalcArray !== null) {
+    allCalcArray.forEach((calc) => {
+      let calcDiv = `<div class='recallDivs' onclick="recallFunction(event)">
+                <p class="recallInputs">${calc.calcInput}</p>
+                <p class="recallOutputs">=${calc.calcOutput}</p>
+              </div>`;
+
+      recallContentBox.insertAdjacentHTML("afterbegin", calcDiv);
+    });
+  }
+};
+
+const closeRecallDiv = () => {
+  if (
+    document.querySelector("#recall-key").classList.contains("clickedRecallKey")
+  ) {
+    document
+      .querySelector("#recallContent")
+      .classList.remove("showRecallContent");
+    document.querySelector("#recall-key").classList.remove("clickedRecallKey");
+  }
+};
+
+const deleteAllRecalls = () => {
+  localStorage.removeItem("allCalcArray");
+  const recallContentBox = (document.querySelector("#theContents").innerHTML =
+    "");
+};

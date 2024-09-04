@@ -16,7 +16,7 @@
     <div id="container">
       <header>
         <div id="recall-div">
-          <p id="recall-key"><i class="fi fi-ts-pending"></i></p>
+          <p id="recall-key" onclick="toggleRecallDiv()"><i class="fi fi-ts-pending"></i></p>
         </div>
         <div class="display-divs firstDisDiv">
           <input
@@ -42,6 +42,16 @@
       </header>
 
       <main>
+        <section id="recallContent">
+          <div id="theContents">
+            <!--recalled divs will be here-->
+          </div>
+          <div id="recallContentKeys">
+            <p onclick="closeRecallDiv()"><i class="fi fi-ts-arrow-small-left recallContentKey"></i></p>
+            <p onclick="deleteAllRecalls()"><i class="fi fi-ts-trash-xmark recallContentKey"></i></p>
+          </div>
+        </section>
+
         <div class="keyColumns">
           <div class="keyRows">
             <p class="keys acKey dkeys">C</p>

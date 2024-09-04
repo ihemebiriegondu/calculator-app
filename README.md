@@ -2,12 +2,14 @@
 
 **Built with: ** HTML, CSS and JavaScipt
 
-**Feature: ** 
+**Feature: **   
    . Basic arithmetic operations (addition, subtraction, multiplication and division)  
 
    . Percentage calculations  
 
-   .
+   . Keyboard input supported  
+
+   .Memory function(recall prev calculations)
 
 **Acknowledgement: **  
 

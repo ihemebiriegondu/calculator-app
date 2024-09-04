@@ -4,7 +4,7 @@ body {
   font-family: "Inter", sans-serif;
   width: inherit;
   margin: 0%;
-  height: 100vh;
+  height: 100%;
   background-color: black;
   display: flex;
   justify-content: center;
